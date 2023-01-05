@@ -1,0 +1,8 @@
+namespace Pine
+{
+    [default_interface]
+    runtimeclass SettingsTab : Microsoft.UI.Xaml.Controls.Page
+    {
+        SettingsTab();
+    }
+}

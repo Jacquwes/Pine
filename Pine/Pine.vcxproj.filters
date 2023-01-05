@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Midl Include="App.idl" />
+    <Midl Include="MainWindow.idl" />
+    <Midl Include="User.idl">
+      <Filter>MIDL</Filter>
+    </Midl>
+    <Midl Include="PineClient.idl">
+      <Filter>MIDL</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="$(GeneratedFilesDir)module.g.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="PineClient.cpp">
+      <Filter>MIDL</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="PineClient.h">
+      <Filter>MIDL</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\Wide310x150Logo.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\StoreLogo.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square150x150Logo.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\Square44x44Logo.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\SplashScreen.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Assets\LockScreenLogo.scale-200.png">
+      <Filter>Assets</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{fbf22cfd-6f2f-4441-8c88-b6f0a97325cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{9261ea79-0d26-4f68-97b2-a003772bcf39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Other">
+      <UniqueIdentifier>{02b87dd7-dbf3-48ed-91fd-0be0fafce832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Xaml">
+      <UniqueIdentifier>{99a5a3e4-271f-4163-bc05-8ec24f022b4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Xaml\Tabs">
+      <UniqueIdentifier>{12a7cc73-ad18-46b5-8754-182e9137bd50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MIDL">
+      <UniqueIdentifier>{09411002-0937-4c3e-836b-f9aeb726e9d1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt">
+      <Filter>Other</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <Filter>Other</Filter>
+    </AppxManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <Filter>Other</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="app.manifest">
+      <Filter>Other</Filter>
+    </Manifest>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="MainWindow.xaml">
+      <Filter>Xaml</Filter>
+    </Page>
+    <Page Include="ConnectionPage.xaml">
+      <Filter>Xaml</Filter>
+    </Page>
+    <Page Include="HomePage.xaml">
+      <Filter>Xaml</Filter>
+    </Page>
+    <Page Include="ChatTab.xaml">
+      <Filter>Xaml\Tabs</Filter>
+    </Page>
+    <Page Include="ContactsTab.xaml">
+      <Filter>Xaml\Tabs</Filter>
+    </Page>
+    <Page Include="ForumTab.xaml">
+      <Filter>Xaml\Tabs</Filter>
+    </Page>
+    <Page Include="ProfileTab.xaml">
+      <Filter>Xaml\Tabs</Filter>
+    </Page>
+    <Page Include="SettingsTab.xaml">
+      <Filter>Xaml\Tabs</Filter>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Filter>Xaml</Filter>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="$(MSBuildThisFileDirectory)..\..\natvis\wil.natvis" />
+  </ItemGroup>
+</Project>

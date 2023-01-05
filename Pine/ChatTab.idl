@@ -1,0 +1,8 @@
+namespace Pine
+{
+    [default_interface]
+    runtimeclass ChatTab : Microsoft.UI.Xaml.Controls.Page
+    {
+        ChatTab();
+    }
+}

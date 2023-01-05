@@ -1,0 +1,14 @@
+import "User.idl";
+
+namespace Pine
+{
+	[default_interface]
+	runtimeclass PineClient
+	{
+		PineClient();
+
+		Windows.Foundation.Collections.IObservableVector<User> Contacts{ get; };
+
+		Windows.Foundation.IAsyncAction LoginAsync(String username, String password);
+	};
+}

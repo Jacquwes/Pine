@@ -1,0 +1,16 @@
+namespace Pine
+{
+    [default_interface]
+    runtimeclass User
+    {
+        User();
+
+        String AvatarUri;
+        String BackgroundUri;
+        String City;
+        String Country;
+        String Id;
+        String Signature;
+        String Username;
+    }
+}

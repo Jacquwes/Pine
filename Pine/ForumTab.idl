@@ -1,0 +1,8 @@
+namespace Pine
+{
+    [default_interface]
+    runtimeclass ForumTab : Microsoft.UI.Xaml.Controls.Page
+    {
+        ForumTab();
+    }
+}

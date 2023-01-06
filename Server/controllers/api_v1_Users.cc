@@ -274,7 +274,12 @@ namespace api::v1
 				}
 				catch (orm::DrogonDbException const& e)
 				{
-					std::cout << "CAVA";
+					json["error"] = "An internal error ocurred.";
+					auto resp = HttpResponse::newHttpJsonResponse(json);
+					resp->setStatusCode(k500InternalServerError);
+					callback(resp);
+
+					co_return;
 				}
 			}
 		));

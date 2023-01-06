@@ -1,5 +1,3 @@
-#define USE_SQLITE3
-
 #include <drogon/drogon.h>
 #include <filesystem>
 

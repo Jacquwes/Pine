@@ -218,6 +218,7 @@ namespace api::v1
 
 			err = false;
 
+			// because it's sha512
 			for (auto& c : password)
 				if ((c < '0' || c > '9') &&
 					(c < 'a' || c > 'z'))
@@ -271,7 +272,7 @@ namespace api::v1
 
 					co_return;
 				}
-				catch (const std::exception&)
+				catch (orm::DrogonDbException const& e)
 				{
 					std::cout << "CAVA";
 				}
@@ -281,5 +282,170 @@ namespace api::v1
 
 	void Users::signup(HttpRequestPtr const& req, std::function<void(HttpResponsePtr const&)>&& callback)
 	{
+#pragma region Validate json
+		if (!req->getJsonObject())
+		{
+			Json::Value json;
+			std::string error = req->getJsonError();
+			json["error"] = error.empty() ? "* Line 0, Column 0\n  Syntax error: object or array expected.\n" : error;
+
+			HttpResponsePtr resp = HttpResponse::newHttpJsonResponse(json);
+			resp->setStatusCode(k400BadRequest);
+			callback(resp);
+
+			return;
+		}
+#pragma endregion
+
+		auto jsonReq = *req->getJsonObject();
+
+#pragma region Check fields
+		if (jsonReq["id"].isNull() || jsonReq["password"].isNull() || jsonReq["username"].isNull())
+		{
+			Json::Value json;
+			json["error"] = "Missing field(s).";
+
+			auto resp = HttpResponse::newHttpJsonResponse(json);
+			resp->setStatusCode(k400BadRequest);
+			callback(resp);
+
+			return;
+		}
+#pragma endregion
+
+		std::string id = jsonReq["id"].asString();
+		std::string password = jsonReq["password"].asString();
+		std::string username = jsonReq["username"].asString();
+
+#pragma region Validate fields
+		{
+			if (username.size() > 24 || username.size() < 3)
+			{
+				Json::Value json;
+				json["error"] = "Username is too long or too short.";
+
+				auto res = HttpResponse::newHttpJsonResponse(json);
+				res->setStatusCode(k400BadRequest);
+				callback(res);
+
+				return;
+			}
+
+			if (id.size() > 24 || id.size() < 3)
+			{
+				Json::Value json;
+				json["error"] = "Id is too long or too short.";
+
+				auto res = HttpResponse::newHttpJsonResponse(json);
+				res->setStatusCode(k400BadRequest);
+				callback(res);
+
+				return;
+			}
+
+			bool err = false;
+
+			for (auto& c : id)
+				if ((c < '-' || c > '9' || c == '/') &&
+					(c < '_' || c > 'z' || c == '`'))
+				{
+					err = true;
+					break;
+				}
+
+			if (err)
+			{
+				Json::Value json;
+				json["error"] = "Invalid characters in id.";
+
+				auto res = HttpResponse::newHttpJsonResponse(json);
+				res->setStatusCode(k400BadRequest);
+				callback(res);
+
+				return;
+			}
+
+			err = false;
+
+			// because it's sha512
+			for (auto& c : password)
+				if ((c < '0' || c > '9') &&
+					(c < 'a' || c > 'z'))
+				{
+					err = true;
+					break;
+				}
+
+			if (password.size() != 128 || err)
+			{
+				Json::Value json;
+				json["error"] = "Invalid password.";
+
+				auto res = HttpResponse::newHttpJsonResponse(json);
+				res->setStatusCode(k400BadRequest);
+				callback(res);
+
+				return;
+			}
+
+		}
+#pragma endregion
+
+		app().getLoop()->queueInLoop(async_func(
+			[=]() -> Task<>
+			{
+				Json::Value json;
+				auto client = app().getDbClient();
+
+				try
+				{
+					auto trans = client->newTransaction();
+
+					auto res = co_await trans->execSqlCoro("select count(*) from users where id=$1;", id);
+					if (res[0][0].as<size_t>() == 1)
+					{
+						json["error"] = "Id already exists.";
+
+						auto resp = HttpResponse::newHttpJsonResponse(json);
+						resp->setStatusCode(k400BadRequest);
+						callback(resp);
+
+						co_return;
+					}
+
+					bool unique = false;
+					std::string token;
+					while (!unique)
+					{
+						token = utils::getUuid();
+						res = co_await trans->execSqlCoro("select count(*) from users where token=$1;", token);
+
+						if (res[0][0].as<size_t>() == 0)
+							unique = true;
+					}
+
+					res = co_await trans->execSqlCoro("insert into users (id, username, password, token) values ($1, $2, $3, $4);", id, username, password, token);
+					
+					json["token"] = token;
+					auto resp = HttpResponse::newHttpJsonResponse(json);
+					resp->setStatusCode(k201Created);
+					callback(resp);
+
+					co_return;
+				}
+				catch (orm::DrogonDbException const& e)
+				{
+					std::cerr << "Database exception: " << e.base().what() << std::endl;
+
+					json["error"] = "An internal error ocurred.";
+
+					auto res = HttpResponse::newHttpJsonResponse(json);
+					res->setStatusCode(k500InternalServerError);
+					callback(res);
+					
+					co_return;
+				}
+			}
+		));
 	}
 }

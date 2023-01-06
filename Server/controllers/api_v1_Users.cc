@@ -305,7 +305,7 @@ namespace api::v1
 		auto jsonReq = *req->getJsonObject();
 
 #pragma region Check fields
-		if (jsonReq["id"].isNull() || jsonReq["password"].isNull() || jsonReq["username"].isNull())
+		if (jsonReq["id"].isNull() || jsonReq["password"].isNull())
 		{
 			Json::Value json;
 			json["error"] = "Missing field(s).";
@@ -320,22 +320,9 @@ namespace api::v1
 
 		std::string id = jsonReq["id"].asString();
 		std::string password = jsonReq["password"].asString();
-		std::string username = jsonReq["username"].asString();
 
 #pragma region Validate fields
 		{
-			if (username.size() > 24 || username.size() < 3)
-			{
-				Json::Value json;
-				json["error"] = "Username is too long or too short.";
-
-				auto res = HttpResponse::newHttpJsonResponse(json);
-				res->setStatusCode(k400BadRequest);
-				callback(res);
-
-				return;
-			}
-
 			if (id.size() > 24 || id.size() < 3)
 			{
 				Json::Value json;
@@ -429,7 +416,7 @@ namespace api::v1
 							unique = true;
 					}
 
-					res = co_await trans->execSqlCoro("insert into users (id, username, password, token) values ($1, $2, $3, $4);", id, username, password, token);
+					res = co_await trans->execSqlCoro("insert into users (id, username, password, token) values ($1, $2, $3, $4);", id, id, password, token);
 					
 					json["token"] = token;
 					auto resp = HttpResponse::newHttpJsonResponse(json);

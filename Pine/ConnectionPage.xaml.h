@@ -12,8 +12,10 @@ namespace winrt::Pine::implementation
 		virtual void OnNavigatedTo(Microsoft::UI::Xaml::Navigation::NavigationEventArgs const&);
 
 		Windows::Foundation::IAsyncAction TryConnect();
+		Windows::Foundation::IAsyncAction TrySignUp();
 		void PasswordBox_KeyDown(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::Input::KeyRoutedEventArgs const& e);
-		void Button_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
+		void LoginButton_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
+		void SignUpButton_Click(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::RoutedEventArgs const& e);
 		void Id_KeyDown(winrt::Windows::Foundation::IInspectable const& sender, winrt::Microsoft::UI::Xaml::Input::KeyRoutedEventArgs const& e);
 	};
 }

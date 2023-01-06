@@ -26,4 +26,27 @@ namespace winrt::Pine::implementation
 			throw e;
 		}
 	}
+
+	Windows::Foundation::IAsyncAction PineClient::SignUpAsync(hstring id, hstring password)
+	{
+		Windows::Web::Http::HttpClient client;
+		Windows::Foundation::Uri uri{ L"http://127.0.0.1/api/v1/users/signup" };
+		Windows::Web::Http::HttpResponseMessage res;
+		std::wstring body;
+
+		try
+		{
+			res = co_await client.PostAsync(uri,
+											Windows::Web::Http::HttpStringContent(L"{\"id\":\"" + id + L"\",\"password\":\"" + password + L"\"}",
+											Windows::Storage::Streams::UnicodeEncoding::Utf8,
+											L"application/json"));
+			res.EnsureSuccessStatusCode();
+			hstring token = Windows::Data::Json::JsonObject::Parse(co_await res.Content().ReadAsStringAsync()).GetNamedString(L"token");
+			m_token = token;
+		}
+		catch (hresult_error const& e)
+		{
+			throw e;
+		}
+	}
 }

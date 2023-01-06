@@ -32,7 +32,17 @@
 
 			<TextBox x:Name="Id" Header="Identifiant" PlaceholderText="Entrez votre identifiant" Margin="10" AcceptsReturn="False" KeyDown="Id_KeyDown"/>
 			<PasswordBox x:Name="Password" Header="Mot de passe" PlaceholderText="Entrez votre mot de passe" Margin="10" KeyDown="PasswordBox_KeyDown"/>
-			<Button HorizontalAlignment="Stretch" Content="Se connecter" Margin="10" Click="Button_Click"/>
+			<Button HorizontalAlignment="Stretch" Content="Se connecter" Margin="10" Click="LoginButton_Click"/>
+			<Button HorizontalAlignment="Stretch" Content="Créer un compte" Margin="10">
+				<Button.Flyout>
+					<Flyout>
+						<StackPanel>
+							<TextBlock Text="Êtes-vous sûr de vouloir créer un compte ?" Margin="10"/>
+							<Button Content="Oui, créer un compte." Click="SignUpButton_Click" Margin="10,0,10,10"/>
+						</StackPanel>
+					</Flyout>
+				</Button.Flyout>
+			</Button>
 			<TextBlock x:Name="ErrorMessage" Foreground="#d00000" HorizontalAlignment="Center"/>
 		</StackPanel>
 		

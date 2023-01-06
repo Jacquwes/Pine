@@ -89,6 +89,7 @@
     <None Include="packages.config">
       <Filter>Other</Filter>
     </None>
+    <None Include="Pine_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="app.manifest">

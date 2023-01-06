@@ -9,6 +9,7 @@ namespace Pine
 
 		Windows.Foundation.Collections.IObservableVector<User> Contacts{ get; };
 
-		Windows.Foundation.IAsyncAction LoginAsync(String username, String password);
+		Windows.Foundation.IAsyncAction LoginAsync(String id, String password);
+		Windows.Foundation.IAsyncAction SignUpAsync(String id, String password);
 	};
 }

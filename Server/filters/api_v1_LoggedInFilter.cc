@@ -34,9 +34,15 @@ void LoggedInFilter::doFilter(const HttpRequestPtr &req,
 
 				auto db = app().getDbClient();
 
-				auto result = db->execSqlSync("select count(*) from users where token=$1", token);
+				orm::Result result;
+				bool validAccountType = true;
+				
+				if (token.substr(0, 4) == "User")
+					result = db->execSqlSync("select count(*) from users where token=$1", token.substr(5));
+				else
+					validAccountType = false;
 
-				if (result[0][0].as<size_t>() == 1)
+				if (validAccountType && result[0][0].as<size_t>() == 1)
 				{
 					fccb();
 				}

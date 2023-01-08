@@ -125,7 +125,7 @@ namespace api::v1
 		app().getLoop()->queueInLoop(async_func(
 			[=]() -> Task<>
 			{
-				auto result = co_await db->execSqlCoro("select avataruri, backgrounduri, city, country, id, signature, username from users where token=$1", req->getHeader("authorization"));
+				auto result = co_await db->execSqlCoro("select avataruri, backgrounduri, city, country, id, signature, username from users where token=$1", req->headers().at("authorization").substr(5));
 
 				Json::Value json;
 

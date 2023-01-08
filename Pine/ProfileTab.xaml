@@ -29,26 +29,17 @@
 			<ScrollViewer VerticalScrollBarVisibility="Visible">
 				<StackPanel>
 					<Grid CornerRadius="10" Margin="20">
-						<Image/>
+						<Image Source="{x:Bind AvatarUri}" />
 					</Grid>
-					
-					<RichTextBlock Margin="20,10,0,10">
-						<Paragraph FontSize="28" FontWeight="Bold">
-							Jacques le chat
-							<Span Foreground="Gray" FontSize="20">#3352</Span>
-						</Paragraph>
-					</RichTextBlock>
 
-					<TextBlock IsTextSelectionEnabled="True" Text="@jacques" Margin="20,10,10,20" Foreground="Gray"/>
+					<TextBlock Margin="20, 10, 0, 10" FontSize="28" FontWeight="Bold"/>
 
-					<TextBlock Text="Brest, France" Margin="20,0" FontWeight="Bold" Foreground="Gray"/>
+					<TextBlock IsTextSelectionEnabled="True" Text="{x:Bind Id}" Margin="20,10,10,20" Foreground="Gray"/>
+
+					<TextBlock Text="{x:Bind Location}" Margin="20,0" FontWeight="Bold" Foreground="Gray"/>
 
 					<TextBlock Margin="20,20,0,0" Text="Signature :" FontWeight="Bold" Foreground="Gray"/>
-					<RichTextBlock Margin="20,0,20,20">
-						<Paragraph>
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-						</Paragraph>
-					</RichTextBlock>
+					<TextBlock Margin="20,0,20,20" Text="{x:Bind Signature}"/>
 				</StackPanel>
 			</ScrollViewer>
 		</Border>

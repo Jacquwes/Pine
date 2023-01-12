@@ -2,6 +2,11 @@
 #include "PineClient.h"
 #include "PineClient.g.cpp"
 
+using namespace winrt;
+using namespace Windows::Foundation;
+using namespace Windows::Data::Json;
+using namespace Windows::Web;
+
 namespace winrt::Pine::implementation
 {
 	Pine::User PineClient::CurrentUser()
@@ -9,22 +14,22 @@ namespace winrt::Pine::implementation
 		return m_currentUser;
 	}
 
-	Windows::Foundation::IAsyncAction PineClient::LoginAsync(hstring id, hstring password)
+	IAsyncAction PineClient::LoginAsync(hstring id, hstring password)
 	{
-		Windows::Foundation::Uri uri{ L"http://127.0.0.1/api/v1/users/login" };
-		Windows::Web::Http::HttpResponseMessage res;
+		Uri uri{ L"http://127.0.0.1/api/v1/users/login" };
+		Http::HttpResponseMessage res;
 		std::wstring body;
 
 		try
 		{
 			res = co_await m_client.PostAsync(uri,
-											Windows::Web::Http::HttpStringContent(L"{\"id\":\"" + id + L"\",\"password\":\"" + password + L"\"}",
+											Http::HttpStringContent(L"{\"id\":\"" + id + L"\",\"password\":\"" + password + L"\"}",
 											Windows::Storage::Streams::UnicodeEncoding::Utf8,
 											L"application/json"));
 			res.EnsureSuccessStatusCode();
-			hstring token = Windows::Data::Json::JsonObject::Parse(co_await res.Content().ReadAsStringAsync()).GetNamedString(L"token");
+			hstring token = JsonObject::Parse(co_await res.Content().ReadAsStringAsync()).GetNamedString(L"token");
 			m_token = token;
-			m_client.DefaultRequestHeaders().Authorization(Windows::Web::Http::Headers::HttpCredentialsHeaderValue(L"User", token));
+			m_client.DefaultRequestHeaders().Authorization(Http::Headers::HttpCredentialsHeaderValue(L"User", token));
 			co_await FetchCurrentUserAsync();
 		}
 		catch (hresult_error const& e)
@@ -33,22 +38,22 @@ namespace winrt::Pine::implementation
 		}
 	}
 
-	Windows::Foundation::IAsyncAction PineClient::SignUpAsync(hstring id, hstring password)
+	IAsyncAction PineClient::SignUpAsync(hstring id, hstring password)
 	{
-		Windows::Foundation::Uri uri{ L"http://127.0.0.1/api/v1/users/signup" };
-		Windows::Web::Http::HttpResponseMessage res;
+		Uri uri{ L"http://127.0.0.1/api/v1/users/signup" };
+		Http::HttpResponseMessage res;
 		std::wstring body;
 
 		try
 		{
 			res = co_await m_client.PostAsync(uri,
-											Windows::Web::Http::HttpStringContent(L"{\"id\":\"" + id + L"\",\"password\":\"" + password + L"\"}",
+											Http::HttpStringContent(L"{\"id\":\"" + id + L"\",\"password\":\"" + password + L"\"}",
 											Windows::Storage::Streams::UnicodeEncoding::Utf8,
 											L"application/json"));
 			res.EnsureSuccessStatusCode();
-			hstring token = Windows::Data::Json::JsonObject::Parse(co_await res.Content().ReadAsStringAsync()).GetNamedString(L"token");
+			hstring token = JsonObject::Parse(co_await res.Content().ReadAsStringAsync()).GetNamedString(L"token");
 			m_token = token;
-			m_client.DefaultRequestHeaders().Authorization(Windows::Web::Http::Headers::HttpCredentialsHeaderValue(token));
+			m_client.DefaultRequestHeaders().Authorization(Http::Headers::HttpCredentialsHeaderValue(token));
 			co_await FetchCurrentUserAsync();
 		}
 		catch (hresult_error const& e)
@@ -57,10 +62,10 @@ namespace winrt::Pine::implementation
 		}
 	}
 	
-	Windows::Foundation::IAsyncAction PineClient::FetchCurrentUserAsync()
+	IAsyncAction PineClient::FetchCurrentUserAsync()
 	{
-		Windows::Foundation::Uri uri{ L"http://127.0.0.1/api/v1/users/me" };
-		Windows::Web::Http::HttpResponseMessage res;
+		Uri uri{ L"http://127.0.0.1/api/v1/users/me" };
+		Http::HttpResponseMessage res;
 		std::wstring body;
 
 		hstring token = m_client.DefaultRequestHeaders().Authorization().Token();
@@ -70,7 +75,7 @@ namespace winrt::Pine::implementation
 		{
 			res = co_await m_client.GetAsync(uri);
 			res.EnsureSuccessStatusCode();
-			auto json = Windows::Data::Json::JsonObject::Parse(co_await res.Content().ReadAsStringAsync());
+			auto json = JsonObject::Parse(co_await res.Content().ReadAsStringAsync());
 			
 			m_currentUser = Pine::User();
 			m_currentUser.AvatarUri(json.GetNamedString(L"avataruri"));

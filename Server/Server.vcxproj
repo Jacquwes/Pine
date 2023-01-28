@@ -106,6 +106,10 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(VCPKG_ROOT)\installed\$(VCPKG_DEFAULT_TRIPLET)\include;$(SolutionDir)SocketMessages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessToFile>false</PreprocessToFile>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,11 +141,15 @@
     <ClCompile Include="Server.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Client.h" />
     <ClInclude Include="Connection.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="Snowflake.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SocketMessages\SocketMessages.vcxproj">
+      <Project>{6a92aec6-cedf-4644-b173-d18694b5b58d}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -38,9 +38,6 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Connection.h">
       <Filter>Header Files</Filter>
     </ClInclude>

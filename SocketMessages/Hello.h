@@ -1,13 +1,14 @@
 #pragma once
 
+#include "pch.h"
+
 #include "Message.h"
 
 namespace SocketMessages
 {
 	struct Hello : Message
 	{
-		Hello()
-			: Message{ MessageType::Hello, 0 }
-		{}
+		Hello() = default;
+		static size_t const size = 0;
 	};
 }

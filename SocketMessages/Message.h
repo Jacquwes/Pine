@@ -7,21 +7,25 @@ namespace SocketMessages
 	enum class MessageType : uint8_t
 	{
 		Invalid,
-		Hello
+		Hello,
+		Login
 	};
 
-	struct Message
+	struct MessageHeader
 	{
-		Message(MessageType const& type, size_t const& size)
-			: type{ type }
-			, size{ size }
-		{
-		}
+		MessageHeader() = default;
+		explicit MessageHeader(std::vector<uint8_t> const& buffer);
+		void Parse(std::vector<uint8_t> const& buffer);
 		
-		virtual ~Message() = default;
-		virtual bool Serialize() { return false; }
+		MessageType type{};
+		size_t size{};
+	};
 
-		MessageType type;
-		size_t size;
+	struct Message : std::enable_shared_from_this<Message>
+	{
+		virtual ~Message() = default;
+		virtual bool ParseBody(std::vector<uint8_t> const& buffer);
+			
+		MessageHeader header{};
 	};
 }

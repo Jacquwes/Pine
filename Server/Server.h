@@ -2,11 +2,10 @@
 
 #include "pch.h"
 
-#include "Client.h"
 #include "Connection.h"
 #include "Coroutine.h"
-#include "Message.h"
 #include "Snowflake.h"
+#include "SocketMessages.h"
 
 // TODO : ping
 
@@ -22,7 +21,6 @@ public:
 	
 	void OnConnect(std::shared_ptr<Connection> client) {}
 	void OnDisconnect(std::shared_ptr<Connection> client) {}
-	void OnMessage(std::shared_ptr<Connection> client, Message message) {}
 	*/
 	void OnMessage(std::shared_ptr<Connection> client, std::shared_ptr<SocketMessages::Message> message) {}
 	

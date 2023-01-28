@@ -2,6 +2,7 @@
 #include "Coroutine.h"
 #include "Server.h"
 #include "ServerException.h"
+#include "SocketMessages.h"
 
 Connection::Connection(SOCKET socket, Server& server)
 	: m_server{ server }
@@ -25,18 +26,44 @@ AsyncTask Connection::Listen()
 {
 	co_await SwitchThread(m_thread);
 
-
-	bool validated = co_await ValidateConnection();
-	if (!validated)
+	if (bool validated = !(co_await ValidateConnection()))
 	{
 		m_server.DisconnectClient(m_id);
 		co_return;
+	}
+
+	while (true)
+	{
+		std::vector<uint8_t>&& receivedMessage = co_await ReceiveRawMessage(sizeof(SocketMessages::MessageHeader));
+		if (receivedMessage.size() != sizeof(SocketMessages::MessageHeader::type) + sizeof(SocketMessages::MessageHeader::size))
+		{
+			m_server.DisconnectClient(m_id);
+			co_return;
+		}
+		
+		SocketMessages::MessageHeader header{ receivedMessage };
+		if (header.type == SocketMessages::MessageType::Invalid)
+		{
+			m_server.DisconnectClient(m_id);
+			co_return;
+		}
+
+		std::vector<uint8_t>&& body = co_await ReceiveRawMessage(header.size);
+		
+		SocketMessages::Message message;
+		message.header = header;
+		
+		m_server.OnMessage(shared_from_this(), std::make_shared<SocketMessages::Message>(message));
 	}
 }
 
 AsyncOperation<std::vector<uint8_t>> Connection::ReceiveRawMessage(size_t const& bufferSize) const
 {
 	std::vector<uint8_t> buffer(bufferSize, 0);
+	
+	if (!bufferSize)
+		co_return buffer;
+	
 	int n = recv(m_socket, std::bit_cast<char*>(buffer.data()), static_cast<int>(bufferSize), 0);
 	if (n == SOCKET_ERROR)
 	{
@@ -74,7 +101,7 @@ AsyncOperation<bool> Connection::ValidateConnection() const
 	auto&& response = co_await ReceiveRawMessage(sizeof(uint64_t));
 	if (response.size() != sizeof(uint64_t))
 		co_return false;
-	
+
 	key ^= 0xF007CAFEC0C0CA7E;
 	keyBuffer.assign(std::bit_cast<uint8_t*>(&key), std::bit_cast<uint8_t*>(&key) + sizeof(uint64_t));
 	

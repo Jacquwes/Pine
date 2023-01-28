@@ -24,6 +24,7 @@ public:
 	void OnDisconnect(std::shared_ptr<Connection> client) {}
 	void OnMessage(std::shared_ptr<Connection> client, Message message) {}
 	*/
+	void OnMessage(std::shared_ptr<Connection> client, std::shared_ptr<SocketMessages::Message> message) {}
 	
 private:
 	bool InitSocket(std::string_view const& port);

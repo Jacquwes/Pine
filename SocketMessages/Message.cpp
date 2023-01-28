@@ -34,8 +34,23 @@ namespace SocketMessages
 		}
 	}
 
+	std::vector<uint8_t> MessageHeader::Serialize() const
+	{
+		std::vector<uint8_t> buffer;
+		buffer.push_back(static_cast<uint8_t>(type));
+		buffer.resize(9);
+		std::memcpy(&buffer[1], &size, sizeof(size));
+		return buffer;
+	}
+
 	bool Message::ParseBody(std::vector<uint8_t> const& buffer)
 	{
 		return false;
+	}
+	
+	std::vector<uint8_t> Message::Serialize() const
+	{
+		std::vector<uint8_t> buffer(9, 0);
+		return buffer;
 	}
 }

@@ -16,7 +16,8 @@ namespace SocketMessages
 		MessageHeader() = default;
 		explicit MessageHeader(std::vector<uint8_t> const& buffer);
 		void Parse(std::vector<uint8_t> const& buffer);
-		
+		std::vector<uint8_t> Serialize() const;
+
 		MessageType type{};
 		size_t size{};
 	};
@@ -25,6 +26,7 @@ namespace SocketMessages
 	{
 		virtual ~Message() = default;
 		virtual bool ParseBody(std::vector<uint8_t> const& buffer);
+		virtual std::vector<uint8_t> Serialize() const;
 			
 		MessageHeader header{};
 	};

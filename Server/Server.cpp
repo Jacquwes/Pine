@@ -29,12 +29,16 @@ void Server::Run(std::string_view const& port)
 	std::cout << "Socket stops listening" << std::endl;
 }
 
+
+
 void Server::Stop()
 {
 	m_stop = true;
 	closesocket(m_socket);
 	WSACleanup();
 }
+
+
 
 AsyncTask Server::DisconnectClient(Snowflake clientId)
 {
@@ -58,6 +62,37 @@ AsyncTask Server::DisconnectClient(Snowflake clientId)
 		(*client)->GetThread().join();
 	m_clients.erase(client);
 }
+
+
+
+AsyncTask Server::MessageClient(std::shared_ptr<Connection> const& client, std::shared_ptr<SocketMessages::Message> const& message) const
+{
+	std::vector<uint8_t> buffer;
+	
+	switch (message->header.type)
+	{
+	case SocketMessages::MessageType::Hello:
+	{
+		buffer = std::dynamic_pointer_cast<SocketMessages::Hello>(message)->Serialize();
+		break;
+	}
+	default:
+		throw ServerException{ "Trying to send unknown message type." };
+		break;
+	}
+
+	co_await client->SendRawMessage(buffer);
+}
+
+
+
+AsyncTask Server::OnConnect(std::shared_ptr<Connection> const& client) const
+{
+	auto hello = std::make_shared<SocketMessages::Hello>();
+	co_await MessageClient(client, std::static_pointer_cast<SocketMessages::Message>(hello));
+}
+
+
 
 bool Server::InitSocket(std::string_view const& port)
 {

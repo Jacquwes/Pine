@@ -16,13 +16,13 @@ public:
 	void Stop();
 
 	AsyncTask DisconnectClient(Snowflake clientId);
+	AsyncTask MessageClient(std::shared_ptr<Connection> const& client, std::shared_ptr<SocketMessages::Message> const& message) const;
 	/*
-	void MessageClient(std::shared_ptr<Connection> client, Message message) {}
 	
-	void OnConnect(std::shared_ptr<Connection> client) {}
 	void OnDisconnect(std::shared_ptr<Connection> client) {}
 	*/
-	void OnMessage(std::shared_ptr<Connection> client, std::shared_ptr<SocketMessages::Message> message) {}
+	AsyncTask OnConnect(std::shared_ptr<Connection> const& client) const;
+	void OnMessage(std::shared_ptr<Connection> const& client, std::shared_ptr<SocketMessages::Message> const& message) {}
 	
 private:
 	bool InitSocket(std::string_view const& port);

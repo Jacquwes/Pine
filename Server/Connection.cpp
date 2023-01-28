@@ -66,14 +66,17 @@ AsyncOperation<bool> Connection::ValidateConnection() const
 	std::uniform_int_distribution<uint64_t> distribution(0, -1);
 	uint64_t key = distribution(engine);
 
-	std::vector<uint8_t> keyBuffer(std::bit_cast<uint8_t*>(&key), std::bit_cast<uint8_t*>(&key) + sizeof(key));
+	std::vector<uint8_t> keyBuffer(std::bit_cast<uint8_t*>(&key), std::bit_cast<uint8_t*>(&key) + sizeof(uint64_t));
 
 	std::cout << "  Sending key " << std::hex << key << std::endl;
 	co_await SendRawMessage(keyBuffer);
 	
-	auto&& response = co_await ReceiveRawMessage(sizeof(key));
-	if (response.empty())
+	auto&& response = co_await ReceiveRawMessage(sizeof(uint64_t));
+	if (response.size() != sizeof(uint64_t))
 		co_return false;
+	
+	key ^= 0xF007CAFEC0C0CA7E;
+	keyBuffer.assign(std::bit_cast<uint8_t*>(&key), std::bit_cast<uint8_t*>(&key) + sizeof(uint64_t));
 	
 	if (std::equal(keyBuffer.begin(), keyBuffer.end(), response.begin()))
 		co_return true;

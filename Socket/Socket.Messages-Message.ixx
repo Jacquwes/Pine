@@ -1,8 +1,12 @@
-#pragma once
+module;
 
-#include "pch.h"
+#include <cstdint>
+#include <memory>
+#include <vector>
 
-namespace SocketMessages
+export module Socket.Messages:Message;
+
+export namespace Socket::Messages
 {
 	enum class MessageType : uint8_t
 	{
@@ -27,7 +31,7 @@ namespace SocketMessages
 		virtual ~Message() = default;
 		virtual bool ParseBody(std::vector<uint8_t> const& buffer);
 		virtual std::vector<uint8_t> Serialize() const;
-			
+
 		MessageHeader header{};
 	};
 }

@@ -1,7 +1,8 @@
-#include "Server.h"
+import Server;
+#pragma comment(lib, "ws2_32.lib")
 
 int main()
 {
-	Server server;
+	Server::Listener server;
 	server.Run("45321");
 }

@@ -1,17 +1,19 @@
-#pragma once
+module;
 
-#include "pch.h"
+#include <vector>
 
-#include "Message.h"
+export module Socket.Messages:Hello;
 
-namespace SocketMessages
+import :Message;
+
+export namespace Socket::Messages
 {
 	struct Hello : Message
 	{
 		Hello() { header.type = MessageType::Hello; }
-		
+
 		static size_t const size = 0;
-		
+
 		std::vector<uint8_t> Serialize() const override
 		{
 			return header.Serialize();

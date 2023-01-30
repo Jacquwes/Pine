@@ -15,29 +15,20 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Socket.Messages-Message.ixx">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Socket.Messages-Message.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Server-Exception.ixx">
+    <ClCompile Include="Socket.Messages-Hello.ixx">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="Server-Coroutines.ixx">
+    <ClCompile Include="Socket.Snowflake.ixx">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="Server-Connection.ixx">
+    <ClCompile Include="Socket.Message.ixx">
       <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Server-Listener.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Server-Listener.ixx">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Server.ixx">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Server-Connection.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

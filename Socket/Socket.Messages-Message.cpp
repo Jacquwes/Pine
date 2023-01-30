@@ -1,9 +1,13 @@
-#include "pch.h"
+module;
 
-#include "Message.h"
-#include "Hello.h"
+#include <cstdint>
+#include <vector>
 
-namespace SocketMessages
+module Socket.Messages:Message;
+
+import :Hello;
+
+namespace Socket::Messages
 {
 	MessageHeader::MessageHeader(std::vector<uint8_t> const& buffer)
 	{
@@ -17,10 +21,10 @@ namespace SocketMessages
 
 		switch (uint8_t messageType = buffer[0])
 		{
-			using enum SocketMessages::MessageType;
+			using enum Socket::Messages::MessageType;
 		case static_cast<int>(Hello):
 			type = Hello;
-			if (size != SocketMessages::Hello::size)
+			if (size != ::Socket::Messages::Hello::size)
 			{
 				type = Invalid;
 			}
@@ -47,7 +51,7 @@ namespace SocketMessages
 	{
 		return false;
 	}
-	
+
 	std::vector<uint8_t> Message::Serialize() const
 	{
 		std::vector<uint8_t> buffer(9, 0);

@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="Socket.Message.ixx" />
     <ClCompile Include="Socket.Messages-Hello.ixx" />
+    <ClCompile Include="Socket.Messages-Login.ixx" />
     <ClCompile Include="Socket.Messages-Message.cpp" />
     <ClCompile Include="Socket.Messages-Message.ixx" />
     <ClCompile Include="Socket.Snowflake.ixx" />

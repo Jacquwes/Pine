@@ -14,7 +14,6 @@ namespace SocketMessages
 
 	void MessageHeader::Parse(std::vector<uint8_t> const& buffer)
 	{
-		size = 3;
 		std::memcpy(&size, &buffer[1], sizeof(size));
 
 		switch (uint8_t messageType = buffer[0])

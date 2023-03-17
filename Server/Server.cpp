@@ -1,3 +1,12 @@
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <ranges>
+#include <string_view>
+#include <thread>
+#include <WS2tcpip.h>
+
+
 #include "Server.h"
 #include "ServerException.h"
 
@@ -9,7 +18,7 @@ void Server::Run(std::string_view const& port)
 	}
 
 	std::cout << "Server Listening" << std::endl;
-	
+
 	m_stop = false;
 	while (!m_stop)
 	{
@@ -20,12 +29,12 @@ void Server::Run(std::string_view const& port)
 			WSACleanup();
 			throw ServerException{ "Failed to accept client: " + WSAGetLastError() };
 		}
-		
+
 		auto client = std::make_shared<Connection>(clientSocket, *this);
 		client->Listen();
 		m_clients.push_back(std::move(client));
 	}
-	
+
 	std::cout << "Socket stops listening" << std::endl;
 }
 
@@ -47,17 +56,17 @@ AsyncTask Server::DisconnectClient(Snowflake clientId)
 		m_thread.request_stop();
 		m_thread.join();
 	}
-	
+
 	co_await SwitchThread(m_thread); // Allow the connection thread to end
 
 	auto client = std::ranges::find_if(std::ranges::begin(m_clients), std::ranges::end(m_clients), [clientId](auto const& potentialClient)
-						 {
-							 return potentialClient->GetId() == clientId;
-						 });
+									   {
+										   return potentialClient->GetId() == clientId;
+									   });
 
 	if (client == m_clients.end())
 		throw ServerException{ "Trying to disconnect inexistent client." };
-	
+
 	if ((*client)->GetThread().joinable())
 		(*client)->GetThread().join();
 	m_clients.erase(client);
@@ -68,7 +77,7 @@ AsyncTask Server::DisconnectClient(Snowflake clientId)
 AsyncTask Server::MessageClient(std::shared_ptr<Connection> const& client, std::shared_ptr<SocketMessages::Message> const& message) const
 {
 	std::vector<uint8_t> buffer;
-	
+
 	switch (message->header.type)
 	{
 	case SocketMessages::MessageType::Hello:

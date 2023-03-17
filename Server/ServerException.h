@@ -1,6 +1,7 @@
 #pragma once
 
-#include "pch.h"
+#include <exception>
+#include <string_view>
 
 struct ServerException : std::exception
 {
@@ -13,6 +14,6 @@ struct ServerException : std::exception
 	{
 		return m_message.data();
 	}
-	
+
 	std::string_view m_message;
 };

@@ -1,4 +1,6 @@
-#include "pch.h"
+#include <cstdint>
+#include <memory>
+#include <vector>
 
 #include "Message.h"
 #include "Hello.h"
@@ -47,7 +49,7 @@ namespace SocketMessages
 	{
 		return false;
 	}
-	
+
 	std::vector<uint8_t> Message::Serialize() const
 	{
 		std::vector<uint8_t> buffer(9, 0);

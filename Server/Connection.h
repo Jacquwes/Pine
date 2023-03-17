@@ -1,6 +1,10 @@
 #pragma once
 
-#include "pch.h"
+#include <cstdint>
+#include <memory>
+#include <vector>
+#include <WinSock2.h>
+
 #include "Coroutine.h"
 #include "Snowflake.h"
 

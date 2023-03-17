@@ -1,6 +1,8 @@
 #pragma once
 
-#include "pch.h"
+#include <cstdint>
+#include <memory>
+#include <vector>
 
 namespace SocketMessages
 {

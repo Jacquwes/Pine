@@ -1,6 +1,8 @@
 #pragma once
 
-#include "pch.h"
+#include <coroutine>
+#include <thread>
+#include <stdexcept>
 
 inline auto SwitchThread(std::jthread& out)
 {

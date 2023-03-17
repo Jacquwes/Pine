@@ -1,7 +1,8 @@
 #pragma once
 
-#include "pch.h"
-
+#include <chrono>
+#include <cstdint>
+#include <ostream>
 
 struct Snowflake
 {

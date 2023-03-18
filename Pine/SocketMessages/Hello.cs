@@ -13,11 +13,26 @@ namespace Pine.SocketMessages
 			header.Type = MessageType.Hello;
 		}
 
-		public override byte[] Serialize()
+		public override bool ParseBody(byte[] buffer)
 		{
-			return header.Serialize();
+			if ((UInt64)buffer.LongLength != Size + MessageHeader.Size)
+				return false;
+
+			Version = BitConverter.ToUInt64(buffer, 0);
+			return true;
 		}
 
-		public static readonly UInt64 Size = 0;
+		public override byte[] Serialize()
+		{
+			byte[] buffer = {};
+			buffer = buffer.Concat(header.Serialize()).ToArray();
+
+			buffer = buffer.Concat(BitConverter.GetBytes(Version)).ToArray();
+
+			return buffer;
+		}
+
+		public static readonly UInt64 Size = sizeof(UInt64);
+		public UInt64 Version = 0x0;
 	}
 }

@@ -14,23 +14,23 @@ namespace SocketMessages
 
 	void MessageHeader::Parse(std::vector<uint8_t> const& buffer)
 	{
-		std::memcpy(&size, &buffer[1], sizeof(size));
+		std::memcpy(&bodySize, &buffer[1], sizeof(bodySize));
 
-		switch (uint8_t messageType = buffer[0])
+		switch (uint8_t messageType_ = buffer[0])
 		{
 			using enum SocketMessages::MessageType;
 		case static_cast<int>(Hello):
-			type = Hello;
+			messageType = Hello;
 			if (size != SocketMessages::Hello::size)
 			{
-				type = Invalid;
+				messageType = Invalid;
 			}
 			break;
 		case static_cast<int>(Login):
-			type = Login;
+			messageType = Login;
 			break;
 		default:
-			type = Invalid;
+			messageType = Invalid;
 			break;
 		}
 	}
@@ -38,7 +38,7 @@ namespace SocketMessages
 	std::vector<uint8_t> MessageHeader::Serialize() const
 	{
 		std::vector<uint8_t> buffer;
-		buffer.push_back(static_cast<uint8_t>(type));
+		buffer.push_back(static_cast<uint8_t>(messageType));
 		buffer.resize(9);
 		std::memcpy(&buffer[1], &size, sizeof(size));
 		return buffer;

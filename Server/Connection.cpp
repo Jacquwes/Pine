@@ -38,6 +38,7 @@ AsyncTask Connection::Listen()
 
 	if (bool validated = !(co_await ValidateConnection()))
 	{
+		std::cout << "  Client failed validation: " << std::dec << m_id << std::endl;
 		m_server.DisconnectClient(m_id);
 		co_return;
 	}
@@ -45,17 +46,15 @@ AsyncTask Connection::Listen()
 
 	co_await m_server.OnConnect(shared_from_this());
 
-	while (true)
+	if (!(co_await CheckVersion()))
 	{
-		std::vector<uint8_t>&& receivedMessage = co_await ReceiveRawMessage(sizeof(SocketMessages::MessageHeader));
-		if (receivedMessage.size() != sizeof(SocketMessages::MessageHeader::type) + sizeof(SocketMessages::MessageHeader::size))
-		{
+		std::cout << "  Client failed version check: " << std::dec << m_id << std::endl;
 			m_server.DisconnectClient(m_id);
 			co_return;
 		}
 		
-		SocketMessages::MessageHeader header{ receivedMessage };
-		if (header.type == SocketMessages::MessageType::Invalid)
+	std::cout << "  Client passed version check: " << std::dec << m_id << std::endl;
+
 		{
 			m_server.DisconnectClient(m_id);
 			co_return;
@@ -71,8 +70,7 @@ AsyncTask Connection::Listen()
 }
 
 
-
-AsyncOperation<std::vector<uint8_t>> Connection::ReceiveRawMessage(size_t const& bufferSize) const
+AsyncOperation<std::vector<uint8_t>> Connection::ReceiveRawMessage(uint64_t const& bufferSize) const
 {
 	std::vector<uint8_t> buffer(bufferSize, 0);
 	
@@ -103,6 +101,19 @@ AsyncTask Connection::SendRawMessage(std::vector<uint8_t> const& buffer) const
 }
 
 
+
+AsyncOperation<bool> Connection::CheckVersion() const
+{
+	std::shared_ptr<SocketMessages::Message> hello = co_await ReceiveMessage();
+	if (hello->header.messageType != SocketMessages::MessageType::Hello)
+		co_return false;
+
+	auto version = std::dynamic_pointer_cast<SocketMessages::Hello>(hello)->version;
+	if (version != CURRENT_VERSION)
+		co_return false;
+
+	co_return true;
+}
 
 AsyncOperation<bool> Connection::ValidateConnection() const
 {

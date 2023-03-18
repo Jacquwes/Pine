@@ -18,9 +18,10 @@ public:
 
 	AsyncTask Listen();
 	
-	AsyncOperation<std::vector<uint8_t>> ReceiveRawMessage(size_t const& bufferSize) const;
+	AsyncOperation<std::vector<uint8_t>> ReceiveRawMessage(uint64_t const& bufferSize) const;
 	AsyncTask SendRawMessage(std::vector<uint8_t> const& buffer) const;
 	
+	AsyncOperation<bool> CheckVersion() const;
 	AsyncOperation<bool> ValidateConnection() const;
 
 	[[nodiscard]] constexpr Snowflake const& GetId() const noexcept { return m_id; }

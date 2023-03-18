@@ -20,8 +20,10 @@ namespace SocketMessages
 		void Parse(std::vector<uint8_t> const& buffer);
 		std::vector<uint8_t> Serialize() const;
 
-		MessageType type{};
-		size_t size{};
+		MessageType messageType{};
+		uint64_t bodySize{};
+
+		static uint64_t constexpr size = sizeof(messageType) + sizeof(bodySize);
 	};
 
 	struct Message : std::enable_shared_from_this<Message>

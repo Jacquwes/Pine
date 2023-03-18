@@ -1,18 +1,41 @@
 #pragma once
 
+#include <bit>
+#include <cstdint>
+#include <vector>
+
 #include "Message.h"
+
+constexpr uint64_t CURRENT_VERSION = 0x0;
 
 namespace SocketMessages
 {
 	struct Hello : Message
 	{
-		Hello() { header.type = MessageType::Hello; }
+		Hello() { header.messageType = MessageType::Hello; }
 		
-		static size_t const size = 0;
+		uint64_t version = CURRENT_VERSION;
+			
+		static uint64_t const size = sizeof(version);
+
+		bool ParseBody(std::vector<uint8_t> const& buffer) override
+		{
+			if (buffer.size() != MessageHeader::size + size)
+				return false;
+
+			std::memcpy(std::bit_cast<void*>(&version), &buffer[MessageHeader::size], sizeof(version));
+			return true;
+		}
 		
 		std::vector<uint8_t> Serialize() const override
 		{
-			return header.Serialize();
+			std::vector<uint8_t> buffer;
+			buffer.append_range(header.Serialize());
+
+			buffer.resize(17);
+			std::memcpy(&buffer[9], &version, sizeof(version));
+
+			return buffer;
 		}
 	};
 }

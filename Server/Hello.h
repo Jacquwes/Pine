@@ -12,7 +12,11 @@ namespace SocketMessages
 {
 	struct Hello : Message
 	{
-		Hello() { header.messageType = MessageType::Hello; }
+		Hello()
+		{
+			header.messageType = MessageType::Hello;
+			header.bodySize = size;
+		}
 		
 		uint64_t version = CURRENT_VERSION;
 			
@@ -20,10 +24,10 @@ namespace SocketMessages
 
 		bool ParseBody(std::vector<uint8_t> const& buffer) override
 		{
-			if (buffer.size() != MessageHeader::size + size)
+			if (buffer.size() != size)
 				return false;
 
-			std::memcpy(std::bit_cast<void*>(&version), &buffer[MessageHeader::size], sizeof(version));
+			std::memcpy(std::bit_cast<void*>(&version), std::bit_cast<void*>(buffer.data()), sizeof(version));
 			return true;
 		}
 		

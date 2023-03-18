@@ -37,7 +37,7 @@ namespace Pine.SocketMessages
 
 		public override byte[] Serialize()
 		{
-			byte[] buffer = {};
+			byte[] buffer = Array.Empty<byte>();
 			buffer = buffer.Concat(header.Serialize()).ToArray();
 
 			buffer = buffer.Concat(BitConverter.GetBytes(Version)).ToArray();

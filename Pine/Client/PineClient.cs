@@ -61,7 +61,7 @@ namespace Pine.Client
 			Message message = new();
 
 			byte[] header = await ReceiveRawMessage(MessageHeader.Size);
-			MessageHeader messageHeader = new MessageHeader(header);
+			MessageHeader messageHeader = new(header);
 			
 			if (messageHeader.Type == MessageType.Invalid)
 				return message;
@@ -70,7 +70,7 @@ namespace Pine.Client
 
 			if (messageHeader.Type == MessageType.Hello)
 			{
-				Hello hello = new Hello();
+				Hello hello = new();
 
 				if (!hello.ParseBody(body))
 					return message;
@@ -95,8 +95,10 @@ namespace Pine.Client
 			if (((Hello)helloReceived).Version != Hello.CURRENT_VERSION)
 				return false;
 
-			Hello hello = new();
-			hello.Version = Hello.CURRENT_VERSION;
+			Hello hello = new()
+			{
+				Version = Hello.CURRENT_VERSION
+			};
 
 			await SendRawMessage(hello.Serialize());
 

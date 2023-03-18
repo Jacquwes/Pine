@@ -5,6 +5,7 @@ VisualStudioVersion = 17.4.32916.344
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3BA13E00-8ADB-43C3-B9D3-5A4E7AE49C67}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		LICENSE.txt = LICENSE.txt
@@ -14,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "Server\Server.vcxproj", "{F11A6291-405C-4A94-AB56-F0027FDD4B4D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pine", "Pine\Pine.csproj", "{4A7FBB45-D550-4AED-9850-82EC1FB1AB1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pine", "Pine\Pine.csproj", "{4A7FBB45-D550-4AED-9850-82EC1FB1AB1F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shared", "Shared\Shared.vcxproj", "{FFA917E0-C449-48C7-BDF3-9877CBD96B46}"
 EndProject

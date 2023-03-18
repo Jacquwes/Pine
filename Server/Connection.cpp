@@ -114,6 +114,7 @@ AsyncOperation<bool> Connection::ValidateConnection() const
 	std::vector<uint8_t> keyBuffer(std::bit_cast<uint8_t*>(&key), std::bit_cast<uint8_t*>(&key) + sizeof(uint64_t));
 
 	std::cout << "  Sending key " << std::hex << key << " to client " << std::dec << m_id << std::endl;
+	std::cout << "  Client should answer " << std::hex << (key ^ 0xF007CAFEC0C0CA7E) << std::endl;
 	co_await SendRawMessage(keyBuffer);
 	
 	auto&& response = co_await ReceiveRawMessage(sizeof(uint64_t));
@@ -123,7 +124,7 @@ AsyncOperation<bool> Connection::ValidateConnection() const
 	key ^= 0xF007CAFEC0C0CA7E;
 	keyBuffer.assign(std::bit_cast<uint8_t*>(&key), std::bit_cast<uint8_t*>(&key) + sizeof(uint64_t));
 	
-	if (std::equal(keyBuffer.begin(), keyBuffer.end(), response.begin()))
+	if (std::ranges::equal(keyBuffer, response))
 		co_return true;
 	co_return false;
 }

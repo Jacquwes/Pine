@@ -1,8 +1,0 @@
-namespace Pine
-{
-    [default_interface]
-    runtimeclass ConnectionPage : Microsoft.UI.Xaml.Controls.Page
-    {
-        ConnectionPage();
-    }
-}

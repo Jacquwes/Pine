@@ -1,8 +1,0 @@
-namespace Pine
-{
-    [default_interface]
-    runtimeclass ContactsTab : Microsoft.UI.Xaml.Controls.Page
-    {
-        ContactsTab();
-    }
-}

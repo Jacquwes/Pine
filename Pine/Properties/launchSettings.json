@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Pine (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Pine (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

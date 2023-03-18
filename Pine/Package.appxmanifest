@@ -2,18 +2,21 @@
 
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="4abcd186-51ec-45f4-831c-5af8ef36b621"
-    Publisher="CN=Jacques"
+    Name="a272f7bc-33e6-45e8-8cbc-b68b0bcfa177"
+    Publisher="CN=Jacquwes"
     Version="1.0.0.0" />
+
+  <mp:PhoneIdentity PhoneProductId="a272f7bc-33e6-45e8-8cbc-b68b0bcfa177" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Pine</DisplayName>
-    <PublisherDisplayName>Jacques</PublisherDisplayName>
+    <PublisherDisplayName>Jacquwes</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 

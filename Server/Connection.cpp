@@ -14,7 +14,7 @@ Connection::Connection(SOCKET socket, Server& server)
 	: m_server{ server }
 	, m_socket{ socket }
 {
-	std::cout << "New client connected: " << std::dec << m_id << std::endl;
+	std::cout << "New client trying to connect: " << std::dec << m_id << std::endl;
 }
 
 
@@ -42,9 +42,8 @@ AsyncTask Connection::Listen()
 		m_server.DisconnectClient(m_id);
 		co_return;
 	}
-	std::cout << "  Client passed validation: " << std::dec << m_id << std::endl;
 
-	co_await m_server.OnConnect(shared_from_this());
+	std::cout << "  Client passed validation: " << std::dec << m_id << std::endl;
 
 	if (!(co_await CheckVersion()))
 	{
@@ -54,6 +53,8 @@ AsyncTask Connection::Listen()
 	}
 
 	std::cout << "  Client passed version check: " << std::dec << m_id << std::endl;
+
+	co_await m_server.OnConnect(shared_from_this());
 
 	while (true)
 	{
@@ -147,6 +148,10 @@ AsyncTask Connection::SendMessage(std::shared_ptr<SocketMessages::Message> const
 
 AsyncOperation<bool> Connection::CheckVersion() const
 {
+	co_await SendMessage(std::static_pointer_cast<SocketMessages::Message>(
+		std::make_shared<SocketMessages::Hello>()
+	));
+
 	std::shared_ptr<SocketMessages::Message> hello = co_await ReceiveMessage();
 	if (hello->header.messageType != SocketMessages::MessageType::Hello)
 		co_return false;

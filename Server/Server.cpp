@@ -84,8 +84,9 @@ AsyncTask Server::MessageClient(std::shared_ptr<Connection> const& client, std::
 
 AsyncTask Server::OnConnect(std::shared_ptr<Connection> const& client) const
 {
-	auto hello = std::make_shared<SocketMessages::Hello>();
-	co_await client->SendMessage(std::static_pointer_cast<SocketMessages::Message>(hello));
+	std::cout << "  Client connected: " << std::dec << client->GetId() << std::endl;
+
+	co_return;
 }
 
 

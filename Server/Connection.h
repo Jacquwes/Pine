@@ -6,6 +6,7 @@
 #include <WinSock2.h>
 
 #include "Coroutine.h"
+#include "SocketMessages.h"
 #include "Snowflake.h"
 
 class Server;
@@ -20,6 +21,8 @@ public:
 	
 	AsyncOperation<std::vector<uint8_t>> ReceiveRawMessage(uint64_t const& bufferSize) const;
 	AsyncTask SendRawMessage(std::vector<uint8_t> const& buffer) const;
+
+	AsyncOperation<std::shared_ptr<SocketMessages::Message>> ReceiveMessage() const;
 	
 	AsyncOperation<bool> CheckVersion() const;
 	AsyncOperation<bool> ValidateConnection() const;

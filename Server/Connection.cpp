@@ -36,7 +36,7 @@ AsyncTask Connection::Listen()
 {
 	co_await SwitchThread(m_thread);
 
-	if (bool validated = !(co_await ValidateConnection()))
+	if (!(co_await ValidateConnection()))
 	{
 		std::cout << "  Client failed validation: " << std::dec << m_id << std::endl;
 		m_server.DisconnectClient(m_id);
@@ -49,23 +49,23 @@ AsyncTask Connection::Listen()
 	if (!(co_await CheckVersion()))
 	{
 		std::cout << "  Client failed version check: " << std::dec << m_id << std::endl;
-			m_server.DisconnectClient(m_id);
-			co_return;
-		}
-		
+		m_server.DisconnectClient(m_id);
+		co_return;
+	}
+
 	std::cout << "  Client passed version check: " << std::dec << m_id << std::endl;
 
+	while (true)
+	{
+		auto&& message = co_await ReceiveMessage();
+		
+		if (message->header.messageType == SocketMessages::MessageType::Invalid)
 		{
 			m_server.DisconnectClient(m_id);
 			co_return;
 		}
 
-		std::vector<uint8_t>&& body = co_await ReceiveRawMessage(header.size);
-		
-		SocketMessages::Message message;
-		message.header = header;
-		
-		m_server.OnMessage(shared_from_this(), std::make_shared<SocketMessages::Message>(message));
+		m_server.OnMessage(shared_from_this(), message);
 	}
 }
 
@@ -98,6 +98,35 @@ AsyncTask Connection::SendRawMessage(std::vector<uint8_t> const& buffer) const
 	}
 	
 	co_return;
+}
+
+
+
+AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMessage() const
+{
+	auto message = std::make_shared<SocketMessages::Message>();
+
+	std::vector<uint8_t> receivedMessage = co_await ReceiveRawMessage(SocketMessages::MessageHeader::size);
+	if (receivedMessage.size() != SocketMessages::MessageHeader::size)
+		co_return message;
+
+	SocketMessages::MessageHeader header{ receivedMessage };
+	if (header.messageType == SocketMessages::MessageType::Invalid)
+		co_return message;
+
+	std::vector<uint8_t> body = co_await ReceiveRawMessage(header.bodySize);
+
+	if (header.messageType == SocketMessages::MessageType::Hello)
+	{
+		if (!std::dynamic_pointer_cast<SocketMessages::Hello>(message)->ParseBody(body))
+			co_return message;
+	}
+	else
+		co_return message;
+
+	message->header = header;
+
+	co_return message;
 }
 
 

@@ -9,6 +9,8 @@
 #include "SocketMessages.h"
 #include "Snowflake.h"
 
+#undef SendMessage
+
 class Server;
 
 class Connection : public std::enable_shared_from_this<Connection>
@@ -23,6 +25,7 @@ public:
 	AsyncTask SendRawMessage(std::vector<uint8_t> const& buffer) const;
 
 	AsyncOperation<std::shared_ptr<SocketMessages::Message>> ReceiveMessage() const;
+	AsyncTask SendMessage(std::shared_ptr<SocketMessages::Message> const& message) const;
 	
 	AsyncOperation<bool> CheckVersion() const;
 	AsyncOperation<bool> ValidateConnection() const;

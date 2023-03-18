@@ -77,14 +77,7 @@ AsyncTask Server::DisconnectClient(Snowflake clientId)
 
 AsyncTask Server::MessageClient(std::shared_ptr<Connection> const& client, std::shared_ptr<SocketMessages::Message> const& message) const
 {
-	std::vector<uint8_t> buffer;
-
-	if (message->header.messageType == SocketMessages::MessageType::Hello)
-		buffer = std::dynamic_pointer_cast<SocketMessages::Hello>(message)->Serialize();
-	else
-		throw ServerException{ "Trying to send unknown message type." };
-
-	co_await client->SendRawMessage(buffer);
+	co_await client->SendMessage(message);
 }
 
 
@@ -92,7 +85,7 @@ AsyncTask Server::MessageClient(std::shared_ptr<Connection> const& client, std::
 AsyncTask Server::OnConnect(std::shared_ptr<Connection> const& client) const
 {
 	auto hello = std::make_shared<SocketMessages::Hello>();
-	co_await MessageClient(client, std::static_pointer_cast<SocketMessages::Message>(hello));
+	co_await client->SendMessage(std::static_pointer_cast<SocketMessages::Message>(hello));
 }
 
 

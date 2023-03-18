@@ -22,7 +22,7 @@ Connection::Connection(SOCKET socket, Server& server)
 Connection::~Connection()
 {
 	std::cout << "Client disconnected: " << std::dec << m_id << std::endl;
-	
+
 	if (m_socket != INVALID_SOCKET)
 	{
 		shutdown(m_socket, SD_BOTH);
@@ -58,7 +58,7 @@ AsyncTask Connection::Listen()
 	while (true)
 	{
 		auto&& message = co_await ReceiveMessage();
-		
+
 		if (message->header.messageType == SocketMessages::MessageType::Invalid)
 		{
 			m_server.DisconnectClient(m_id);
@@ -73,10 +73,10 @@ AsyncTask Connection::Listen()
 AsyncOperation<std::vector<uint8_t>> Connection::ReceiveRawMessage(uint64_t const& bufferSize) const
 {
 	std::vector<uint8_t> buffer(bufferSize, 0);
-	
+
 	if (!bufferSize)
 		co_return buffer;
-	
+
 	int n = recv(m_socket, std::bit_cast<char*>(buffer.data()), static_cast<int>(bufferSize), 0);
 	if (n == SOCKET_ERROR)
 	{
@@ -96,7 +96,7 @@ AsyncTask Connection::SendRawMessage(std::vector<uint8_t> const& buffer) const
 	{
 		throw ServerException{ "Failed to send message: " + WSAGetLastError() };
 	}
-	
+
 	co_return;
 }
 
@@ -118,6 +118,8 @@ AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMess
 
 	if (header.messageType == SocketMessages::MessageType::Hello)
 	{
+		message = std::make_shared<SocketMessages::Hello>();
+
 		if (!std::dynamic_pointer_cast<SocketMessages::Hello>(message)->ParseBody(body))
 			co_return message;
 	}
@@ -127,6 +129,18 @@ AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMess
 	message->header = header;
 
 	co_return message;
+}
+
+AsyncTask Connection::SendMessage(std::shared_ptr<SocketMessages::Message> const& message) const
+{
+	std::vector<uint8_t> buffer;
+
+	if (message->header.messageType == SocketMessages::MessageType::Hello)
+		buffer = std::dynamic_pointer_cast<SocketMessages::Hello>(message)->Serialize();
+	else
+		throw ServerException{ "Trying to send unknown message type." };
+
+	co_await SendRawMessage(buffer);
 }
 
 
@@ -156,14 +170,14 @@ AsyncOperation<bool> Connection::ValidateConnection() const
 	std::cout << "  Sending key " << std::hex << key << " to client " << std::dec << m_id << std::endl;
 	std::cout << "  Client should answer " << std::hex << (key ^ 0xF007CAFEC0C0CA7E) << std::endl;
 	co_await SendRawMessage(keyBuffer);
-	
+
 	auto&& response = co_await ReceiveRawMessage(sizeof(uint64_t));
 	if (response.size() != sizeof(uint64_t))
 		co_return false;
 
 	key ^= 0xF007CAFEC0C0CA7E;
 	keyBuffer.assign(std::bit_cast<uint8_t*>(&key), std::bit_cast<uint8_t*>(&key) + sizeof(uint64_t));
-	
+
 	if (std::ranges::equal(keyBuffer, response))
 		co_return true;
 	co_return false;

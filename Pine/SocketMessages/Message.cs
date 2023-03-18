@@ -64,6 +64,11 @@ namespace Pine.SocketMessages
 	{
 		public MessageHeader header;
 
+		public Message()
+		{
+			header = new();
+		}
+
 		public virtual bool ParseBody(byte[] buffer)
 		{
 			return false;

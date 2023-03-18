@@ -31,6 +31,13 @@ namespace Pine.Client
 
 			if (tcpClient.Connected)
 				stream = tcpClient.GetStream();
+			else
+				return false;
+
+			await ValidateConnection();
+
+			if (!await CheckVersion())
+				return false;
 
 			OnConnected?.Invoke(this, tcpClient.Connected);
 
@@ -46,30 +53,65 @@ namespace Pine.Client
 
 		public async Task SendRawMessage(byte[] buffer)
 		{
-			await tcpClient.Client.SendAsync(buffer,SocketFlags.None);
+			await tcpClient.Client.SendAsync(buffer, SocketFlags.None);
 		}
 
-		public async Task<bool> ValidateConnection()
+		public async Task<Message> ReceiveMessage()
+		{
+			Message message = new();
+
+			byte[] header = await ReceiveRawMessage(MessageHeader.Size);
+			MessageHeader messageHeader = new MessageHeader(header);
+			
+			if (messageHeader.Type == MessageType.Invalid)
+				return message;
+
+			byte[] body = await ReceiveRawMessage(messageHeader.BodySize);
+
+			if (messageHeader.Type == MessageType.Hello)
+			{
+				Hello hello = new Hello();
+
+				if (!hello.ParseBody(body))
+					return message;
+
+				message = hello;
+			}
+			else
+				return message;
+
+			message.header = messageHeader;
+
+			return message;
+		}
+
+		public async Task<bool> CheckVersion()
+		{
+			Message helloReceived = await ReceiveMessage();
+
+			if (helloReceived.header.Type != MessageType.Hello)
+				return false;
+
+			if (((Hello)helloReceived).Version != Hello.CURRENT_VERSION)
+				return false;
+
+			Hello hello = new();
+			hello.Version = Hello.CURRENT_VERSION;
+
+			await SendRawMessage(hello.Serialize());
+
+			return true;
+		}
+
+		public async Task ValidateConnection()
 		{
 			byte[] buffer = await ReceiveRawMessage(8);
 
 			UInt64 key = BitConverter.ToUInt64(buffer) ^ 0xF007CAFEC0C0CA7E;
 
 			await SendRawMessage(BitConverter.GetBytes(key));
-
-			byte[] hello = await ReceiveRawMessage(9);
-			MessageHeader messageHeader = new MessageHeader(hello);
-			if (messageHeader.Type != MessageType.Hello)
-			{
-				OnValidated?.Invoke(this, false);
-				return false;
-			}
-
-			OnValidated?.Invoke(this, true);
-			return true;
 		}
 
 		public event EventHandler<bool> OnConnected;
-		public event EventHandler<bool> OnValidated;
 	}
 }

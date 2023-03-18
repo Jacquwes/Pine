@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,14 +9,26 @@ namespace Pine.SocketMessages
 {
 	internal class Hello : Message
 	{
+		public static readonly UInt64 CURRENT_VERSION = 0x0;
+
 		public Hello()
 		{
 			header.Type = MessageType.Hello;
+			header.BodySize = Size;
+		}
+
+		public Hello(Message m)
+		{
+			foreach (FieldInfo prop in m.GetType().GetFields())
+				GetType().GetField(prop.Name).SetValue(this, prop.GetValue(m));
+
+			foreach (PropertyInfo prop in m.GetType().GetProperties())
+				GetType().GetProperty(prop.Name).SetValue(this, prop.GetValue(m, null), null);
 		}
 
 		public override bool ParseBody(byte[] buffer)
 		{
-			if ((UInt64)buffer.LongLength != Size + MessageHeader.Size)
+			if ((UInt64)buffer.LongLength != Size)
 				return false;
 
 			Version = BitConverter.ToUInt64(buffer, 0);

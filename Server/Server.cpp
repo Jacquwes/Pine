@@ -9,6 +9,7 @@
 
 #include "Server.h"
 #include "ServerException.h"
+#include "SocketMessages.h"
 
 void Server::Run(std::string_view const& port)
 {
@@ -78,17 +79,10 @@ AsyncTask Server::MessageClient(std::shared_ptr<Connection> const& client, std::
 {
 	std::vector<uint8_t> buffer;
 
-	switch (message->header.type)
-	{
-	case SocketMessages::MessageType::Hello:
-	{
+	if (message->header.messageType == SocketMessages::MessageType::Hello)
 		buffer = std::dynamic_pointer_cast<SocketMessages::Hello>(message)->Serialize();
-		break;
-	}
-	default:
+	else
 		throw ServerException{ "Trying to send unknown message type." };
-		break;
-	}
 
 	co_await client->SendRawMessage(buffer);
 }

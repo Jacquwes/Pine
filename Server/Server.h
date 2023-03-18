@@ -1,8 +1,5 @@
 #pragma once
 
-#pragma comment(lib, "ws2_32.lib")
-
-
 #include <deque>
 #include <thread>
 #include <memory>
@@ -13,7 +10,9 @@
 #include "Snowflake.h"
 #include "SocketMessages.h"
 
-// TODO : ping
+#pragma comment(lib, "ws2_32.lib")
+
+
 
 class Server
 {
@@ -23,12 +22,11 @@ public:
 
 	AsyncTask DisconnectClient(Snowflake clientId);
 	AsyncTask MessageClient(std::shared_ptr<Connection> const& client, std::shared_ptr<SocketMessages::Message> const& message) const;
-	/*
-
-	void OnDisconnect(std::shared_ptr<Connection> client) {}
-	*/
 	AsyncTask OnConnect(std::shared_ptr<Connection> const& client) const;
-	void OnMessage(std::shared_ptr<Connection> const& client, std::shared_ptr<SocketMessages::Message> const& message) {}
+	void OnMessage(std::shared_ptr<Connection> const&, std::shared_ptr<SocketMessages::Message> const&) const
+	{
+		// 
+	}
 
 private:
 	bool InitSocket(std::string_view const& port);

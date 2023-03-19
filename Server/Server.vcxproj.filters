@@ -59,5 +59,8 @@
     <ClInclude Include="SocketMessages.h">
       <Filter>Header Files\SocketMessages</Filter>
     </ClInclude>
+    <ClInclude Include="LoginMessage.h">
+      <Filter>Header Files\SocketMessages</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

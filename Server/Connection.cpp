@@ -124,6 +124,13 @@ AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMess
 		if (!std::dynamic_pointer_cast<SocketMessages::HelloMessage>(message)->ParseBody(body))
 			co_return message;
 	}
+	else if (header.messageType == SocketMessages::MessageType::LoginMessage)
+	{
+		message = std::make_shared<SocketMessages::LoginMessage>();
+
+		if (!std::dynamic_pointer_cast<SocketMessages::LoginMessage>(message)->ParseBody(body))
+			co_return message;
+	}
 	else
 		co_return message;
 

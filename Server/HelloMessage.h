@@ -6,7 +6,7 @@
 
 #include "Message.h"
 
-constexpr uint64_t CURRENT_VERSION = 0x0;
+constexpr uint64_t CurrentVersion = 0x0;
 
 namespace SocketMessages
 {
@@ -17,10 +17,6 @@ namespace SocketMessages
 			header.messageType = MessageType::HelloMessage;
 			header.bodySize = size;
 		}
-		
-		uint64_t version = CURRENT_VERSION;
-			
-		static uint64_t const size = sizeof(version);
 
 		bool ParseBody(std::vector<uint8_t> const& buffer) override
 		{
@@ -41,5 +37,8 @@ namespace SocketMessages
 
 			return buffer;
 		}
+		
+		uint64_t version = CurrentVersion;
+		static uint64_t const size = sizeof(version);
 	};
 }

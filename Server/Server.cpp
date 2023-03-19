@@ -18,7 +18,7 @@ void Server::Run(std::string_view const& port)
 		throw ServerException{ "Failed to initialize socket: " + WSAGetLastError() };
 	}
 
-	std::cout << "Pine - version " << std::hex << CURRENT_VERSION << "\nServer Listening" << std::endl;
+	std::cout << "Pine - version " << std::hex << CurrentVersion << "\nServer Listening" << std::endl;
 
 	m_stop = false;
 	while (!m_stop)

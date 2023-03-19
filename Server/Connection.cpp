@@ -157,7 +157,7 @@ AsyncOperation<bool> Connection::CheckVersion() const
 		co_return false;
 
 	auto version = std::dynamic_pointer_cast<SocketMessages::HelloMessage>(hello)->version;
-	if (version != CURRENT_VERSION)
+	if (version != CurrentVersion)
 		co_return false;
 
 	co_return true;

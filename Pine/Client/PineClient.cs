@@ -27,7 +27,10 @@ namespace Pine.Client
 
 		public async Task<bool> ConnectAsync(string host, int port)
 		{
+			try
+			{
 			await tcpClient.ConnectAsync(host, port);
+
 
 			if (tcpClient.Connected)
 				stream = tcpClient.GetStream();
@@ -42,6 +45,14 @@ namespace Pine.Client
 			OnConnected?.Invoke(this, tcpClient.Connected);
 
 			return tcpClient.Connected;
+
+		}
+			catch (SocketException e)
+			{
+				OnConnectionFailed?.Invoke(this, (Int32)e.SocketErrorCode);
+
+				return false;
+			}
 		}
 
 		public async Task<byte[]> ReceiveRawMessage(UInt64 size)

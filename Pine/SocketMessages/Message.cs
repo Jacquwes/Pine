@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Pine.SocketMessages
 {
-	enum MessageType : byte
+	public enum MessageType : byte
 	{
 		Invalid,
 		Hello,
 		Login
 	}
 
-	internal class MessageHeader
+	public class MessageHeader
 	{
 		public MessageHeader()
 		{
@@ -60,7 +60,7 @@ namespace Pine.SocketMessages
 		public static readonly UInt64 Size = sizeof(MessageType) + sizeof(UInt64);
 	}
 
-	class Message
+	public class Message
 	{
 		public MessageHeader header;
 

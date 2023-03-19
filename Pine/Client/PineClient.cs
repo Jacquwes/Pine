@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Pine.Client
 {
-	internal class PineClient
+	public class PineClient
 	{
 		private readonly TcpClient tcpClient;
 		private NetworkStream stream;

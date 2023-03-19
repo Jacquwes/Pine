@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
+using Pine.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,7 +33,10 @@ namespace Pine
 		/// </summary>
 		public App()
 		{
-			this.InitializeComponent();
+			InitializeComponent();
+
+			PineClient = new PineClient();
+			_ = PineClient.ConnectAsync("127.0.0.1", 45321);
 		}
 
 		/// <summary>
@@ -44,6 +48,8 @@ namespace Pine
 			m_window = new MainWindow();
 			m_window.Activate();
 		}
+
+		public static PineClient PineClient { get; private set; }
 
 		private Window m_window;
 	}

@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 
 namespace Pine.SocketMessages
 {
-	internal class Hello : Message
+	public class HelloMessage : Message
 	{
 		public static readonly UInt64 CURRENT_VERSION = 0x0;
 
-		public Hello()
+		public HelloMessage()
 		{
-			header.Type = MessageType.Hello;
-			header.BodySize = Size;
+			Header.Type = MessageType.Hello;
+			Header.BodySize = Size;
 		}
 
-		public Hello(Message m)
+		public HelloMessage(Message m)
 		{
 			foreach (FieldInfo prop in m.GetType().GetFields())
 				GetType().GetField(prop.Name).SetValue(this, prop.GetValue(m));
@@ -38,7 +38,7 @@ namespace Pine.SocketMessages
 		public override byte[] Serialize()
 		{
 			byte[] buffer = Array.Empty<byte>();
-			buffer = buffer.Concat(header.Serialize()).ToArray();
+			buffer = buffer.Concat(Header.Serialize()).ToArray();
 
 			buffer = buffer.Concat(BitConverter.GetBytes(Version)).ToArray();
 
@@ -46,6 +46,6 @@ namespace Pine.SocketMessages
 		}
 
 		public static readonly UInt64 Size = sizeof(UInt64);
-		public UInt64 Version = 0x0;
+		public UInt64 Version { get; set; } = 0;
 	}
 }

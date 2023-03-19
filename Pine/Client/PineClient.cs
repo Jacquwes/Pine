@@ -29,24 +29,24 @@ namespace Pine.Client
 		{
 			try
 			{
-			await tcpClient.ConnectAsync(host, port);
+				await tcpClient.ConnectAsync(host, port);
 
 
-			if (tcpClient.Connected)
-				stream = tcpClient.GetStream();
-			else
-				return false;
+				if (tcpClient.Connected)
+					stream = tcpClient.GetStream();
+				else
+					return false;
 
-			await ValidateConnection();
+				await ValidateConnection();
 
-			if (!await CheckVersion())
-				return false;
+				if (!await CheckVersion())
+					return false;
 
-			OnConnected?.Invoke(this, tcpClient.Connected);
+				OnConnected?.Invoke(this, tcpClient.Connected);
 
-			return tcpClient.Connected;
+				return tcpClient.Connected;
 
-		}
+			}
 			catch (SocketException e)
 			{
 				OnConnectionFailed?.Invoke(this, (Int32)e.SocketErrorCode);
@@ -73,7 +73,7 @@ namespace Pine.Client
 
 			byte[] header = await ReceiveRawMessage(MessageHeader.Size);
 			MessageHeader messageHeader = new(header);
-			
+
 			if (messageHeader.Type == MessageType.Invalid)
 				return message;
 
@@ -81,7 +81,7 @@ namespace Pine.Client
 
 			if (messageHeader.Type == MessageType.Hello)
 			{
-				Hello hello = new();
+				HelloMessage hello = new();
 
 				if (!hello.ParseBody(body))
 					return message;
@@ -91,7 +91,7 @@ namespace Pine.Client
 			else
 				return message;
 
-			message.header = messageHeader;
+			message.Header = messageHeader;
 
 			return message;
 		}
@@ -100,15 +100,15 @@ namespace Pine.Client
 		{
 			Message helloReceived = await ReceiveMessage();
 
-			if (helloReceived.header.Type != MessageType.Hello)
+			if (helloReceived.Header.Type != MessageType.Hello)
 				return false;
 
-			if (((Hello)helloReceived).Version != Hello.CURRENT_VERSION)
+			if (((HelloMessage)helloReceived).Version != HelloMessage.CURRENT_VERSION)
 				return false;
 
-			Hello hello = new()
+			HelloMessage hello = new()
 			{
-				Version = Hello.CURRENT_VERSION
+				Version = HelloMessage.CURRENT_VERSION
 			};
 
 			await SendRawMessage(hello.Serialize());
@@ -126,5 +126,6 @@ namespace Pine.Client
 		}
 
 		public event EventHandler<bool> OnConnected;
+		public event EventHandler<int> OnConnectionFailed;
 	}
 }

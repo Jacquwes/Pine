@@ -34,7 +34,7 @@ namespace Pine.SocketMessages
 			{
 				case (byte)MessageType.Hello:
 					Type = MessageType.Hello;
-					if (BodySize != Hello.Size)
+					if (BodySize != HelloMessage.Size)
 						Type = MessageType.Invalid;
 					break;
 				case (byte)MessageType.Login:
@@ -62,11 +62,11 @@ namespace Pine.SocketMessages
 
 	public class Message
 	{
-		public MessageHeader header;
+		public MessageHeader Header { get; set; }
 
 		public Message()
 		{
-			header = new();
+			Header = new();
 		}
 
 		public virtual bool ParseBody(byte[] buffer)

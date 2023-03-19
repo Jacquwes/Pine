@@ -17,15 +17,6 @@ namespace Pine.SocketMessages
 			Header.BodySize = Size;
 		}
 
-		public HelloMessage(Message m)
-		{
-			foreach (FieldInfo prop in m.GetType().GetFields())
-				GetType().GetField(prop.Name).SetValue(this, prop.GetValue(m));
-
-			foreach (PropertyInfo prop in m.GetType().GetProperties())
-				GetType().GetProperty(prop.Name).SetValue(this, prop.GetValue(m, null), null);
-		}
-
 		public override bool ParseBody(byte[] buffer)
 		{
 			if ((UInt64)buffer.LongLength != Size)

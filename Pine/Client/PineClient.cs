@@ -96,6 +96,11 @@ namespace Pine.Client
 			return message;
 		}
 
+		public async Task SendMessage(Message message)
+		{
+			await SendRawMessage(message.Serialize());
+		}
+
 		public async Task<bool> CheckVersion()
 		{
 			Message helloReceived = await ReceiveMessage();

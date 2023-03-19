@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using Pine.SocketMessages;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,6 +46,15 @@ namespace Pine.Views.Identify
 		{
 			ConnectionStatusBlock.Text = "Connecté au serveur";
 			ConnectionStatusBlock.Foreground = new SolidColorBrush(Colors.Green);
+
+			IdentifyForm.OnLogIn += IdentifyForm_OnLogIn;
+		}
+
+		private void IdentifyForm_OnLogIn(Object sender, LogInEventArgs e)
+		{
+			LoginMessage loginMessage = new();
+			loginMessage.SetUsername(e.Username);
+			_ = App.PineClient.SendMessage(loginMessage);
 		}
 	}
 }

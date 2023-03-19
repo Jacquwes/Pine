@@ -18,10 +18,7 @@ namespace Pine
 		{
 			InitializeComponent();
 
-			client = new PineClient();
-			client.OnConnected += OnClientConnected;
-
-			_ = client.ConnectAsync("127.0.0.1", 45321);
+			MainFrame.Navigate(typeof(IdentifyPage));
 		}
 	}
 }

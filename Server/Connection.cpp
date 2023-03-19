@@ -10,6 +10,8 @@
 #include "ServerException.h"
 #include "SocketMessages.h"
 
+
+
 Connection::Connection(SOCKET socket, Server& server)
 	: m_server{ server }
 	, m_socket{ socket }
@@ -36,23 +38,11 @@ AsyncTask Connection::Listen()
 {
 	co_await SwitchThread(m_thread);
 
-	if (!(co_await ValidateConnection()))
+	if (!(co_await EstablishConnection()))
 	{
-		std::cout << "  Client failed validation: " << std::dec << m_id << std::endl;
 		m_server.DisconnectClient(m_id);
 		co_return;
 	}
-
-	std::cout << "  Client passed validation: " << std::dec << m_id << std::endl;
-
-	if (!(co_await CheckVersion()))
-	{
-		std::cout << "  Client failed version check: " << std::dec << m_id << std::endl;
-		m_server.DisconnectClient(m_id);
-		co_return;
-	}
-
-	std::cout << "  Client passed version check: " << std::dec << m_id << std::endl;
 
 	co_await m_server.OnConnect(shared_from_this());
 
@@ -69,6 +59,7 @@ AsyncTask Connection::Listen()
 		m_server.OnMessage(shared_from_this(), message);
 	}
 }
+
 
 
 AsyncOperation<std::vector<uint8_t>> Connection::ReceiveRawMessage(uint64_t const& bufferSize) const
@@ -139,6 +130,8 @@ AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMess
 	co_return message;
 }
 
+
+
 AsyncTask Connection::SendMessage(std::shared_ptr<SocketMessages::Message> const& message) const
 {
 	std::vector<uint8_t> buffer;
@@ -149,6 +142,41 @@ AsyncTask Connection::SendMessage(std::shared_ptr<SocketMessages::Message> const
 		throw ServerException{ "Trying to send unknown message type." };
 
 	co_await SendRawMessage(buffer);
+}
+
+
+
+AsyncOperation<bool> Connection::EstablishConnection()
+{
+	if (!(co_await ValidateConnection()))
+	{
+		std::cout << "  Client failed validation: " << std::dec << m_id << std::endl;
+		co_return false;
+	}
+
+	std::cout << "  Client passed validation: " << std::dec << m_id << std::endl;
+
+	if (!(co_await CheckVersion()))
+	{
+		std::cout << "  Client failed version check: " << std::dec << m_id << std::endl;
+		m_server.DisconnectClient(m_id);
+		co_return false;
+	}
+
+	std::cout << "  Client passed version check: " << std::dec << m_id << std::endl;
+
+	if (!(co_await Login()))
+	{
+		std::cout << "  Client failed login: " << std::dec << m_id << std::endl;
+		m_server.DisconnectClient(m_id);
+		co_return false;
+	}
+
+	auto username = m_user->m_username;
+
+	std::cout << "  Client successfully logged in as \"" << m_user->m_username << "\": " << std::dec << m_id << std::endl;
+
+	co_return true;
 }
 
 
@@ -169,6 +197,25 @@ AsyncOperation<bool> Connection::CheckVersion() const
 
 	co_return true;
 }
+
+
+
+AsyncOperation<bool> Connection::Login()
+{
+	auto&& message = co_await ReceiveMessage();
+
+	if (message->header.messageType != SocketMessages::MessageType::LoginMessage)
+		co_return false;
+
+	auto&& loginMessage = std::dynamic_pointer_cast<SocketMessages::LoginMessage>(message);
+	
+	m_user->m_username = std::bit_cast<char*>(loginMessage->username.data());
+	m_user->m_isLoggedIn = true;
+
+	co_return true;
+}
+
+
 
 AsyncOperation<bool> Connection::ValidateConnection() const
 {

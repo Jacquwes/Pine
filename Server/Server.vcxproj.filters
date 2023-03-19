@@ -39,6 +39,12 @@
     <ClCompile Include="Message.cpp">
       <Filter>Source Files\SocketMessages</Filter>
     </ClCompile>
+    <ClCompile Include="User.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerOnMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Server.h">
@@ -61,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="LoginMessage.h">
       <Filter>Header Files\SocketMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="User.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

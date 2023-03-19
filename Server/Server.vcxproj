@@ -145,6 +145,8 @@
     <ClCompile Include="ServerException.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Server.cpp" />
+    <ClCompile Include="ServerOnMessage.cpp" />
+    <ClCompile Include="User.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Connection.h" />
@@ -154,6 +156,7 @@
     <ClInclude Include="Server.h" />
     <ClInclude Include="Snowflake.h" />
     <ClInclude Include="SocketMessages.h" />
+    <ClInclude Include="User.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.vcxproj">

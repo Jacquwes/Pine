@@ -8,6 +8,7 @@
 #include "Coroutine.h"
 #include "SocketMessages.h"
 #include "Snowflake.h"
+#include "User.h"
 
 #undef SendMessage
 
@@ -32,10 +33,12 @@ public:
 
 	[[nodiscard]] constexpr Snowflake const& GetId() const noexcept { return m_id; }
 	[[nodiscard]] constexpr std::jthread& GetThread() noexcept { return m_thread; }
+	[[nodiscard]] constexpr std::shared_ptr<User> const& GetUser() const noexcept { return m_user; }
 	
 private:
 	std::jthread m_thread;
 	Snowflake m_id;
 	Server& m_server;
 	SOCKET m_socket;
+	std::shared_ptr<User> m_user{ std::make_shared<User>() };
 };

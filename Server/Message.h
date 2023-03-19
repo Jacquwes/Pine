@@ -8,9 +8,9 @@ namespace SocketMessages
 {
 	enum class MessageType : uint8_t
 	{
-		Invalid,
-		Hello,
-		Login
+		InvalidMessage,
+		HelloMessage,
+		LoginMessage
 	};
 
 	struct MessageHeader

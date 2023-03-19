@@ -148,7 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Connection.h" />
-    <ClInclude Include="Hello.h" />
+    <ClInclude Include="HelloMessage.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="Snowflake.h" />

@@ -10,11 +10,11 @@ constexpr uint64_t CURRENT_VERSION = 0x0;
 
 namespace SocketMessages
 {
-	struct Hello : Message
+	struct HelloMessage : Message
 	{
-		Hello()
+		HelloMessage()
 		{
-			header.messageType = MessageType::Hello;
+			header.messageType = MessageType::HelloMessage;
 			header.bodySize = size;
 		}
 		

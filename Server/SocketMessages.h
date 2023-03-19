@@ -1,4 +1,4 @@
 #pragma once
 
-#include "Hello.h"
+#include "HelloMessage.h"
 #include "Message.h"

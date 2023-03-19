@@ -60,7 +60,7 @@ AsyncTask Connection::Listen()
 	{
 		auto&& message = co_await ReceiveMessage();
 
-		if (message->header.messageType == SocketMessages::MessageType::Invalid)
+		if (message->header.messageType == SocketMessages::MessageType::InvalidMessage)
 		{
 			m_server.DisconnectClient(m_id);
 			co_return;
@@ -112,16 +112,16 @@ AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMess
 		co_return message;
 
 	SocketMessages::MessageHeader header{ receivedMessage };
-	if (header.messageType == SocketMessages::MessageType::Invalid)
+	if (header.messageType == SocketMessages::MessageType::InvalidMessage)
 		co_return message;
 
 	std::vector<uint8_t> body = co_await ReceiveRawMessage(header.bodySize);
 
-	if (header.messageType == SocketMessages::MessageType::Hello)
+	if (header.messageType == SocketMessages::MessageType::HelloMessage)
 	{
-		message = std::make_shared<SocketMessages::Hello>();
+		message = std::make_shared<SocketMessages::HelloMessage>();
 
-		if (!std::dynamic_pointer_cast<SocketMessages::Hello>(message)->ParseBody(body))
+		if (!std::dynamic_pointer_cast<SocketMessages::HelloMessage>(message)->ParseBody(body))
 			co_return message;
 	}
 	else
@@ -136,8 +136,8 @@ AsyncTask Connection::SendMessage(std::shared_ptr<SocketMessages::Message> const
 {
 	std::vector<uint8_t> buffer;
 
-	if (message->header.messageType == SocketMessages::MessageType::Hello)
-		buffer = std::dynamic_pointer_cast<SocketMessages::Hello>(message)->Serialize();
+	if (message->header.messageType == SocketMessages::MessageType::HelloMessage)
+		buffer = std::dynamic_pointer_cast<SocketMessages::HelloMessage>(message)->Serialize();
 	else
 		throw ServerException{ "Trying to send unknown message type." };
 
@@ -149,14 +149,14 @@ AsyncTask Connection::SendMessage(std::shared_ptr<SocketMessages::Message> const
 AsyncOperation<bool> Connection::CheckVersion() const
 {
 	co_await SendMessage(std::static_pointer_cast<SocketMessages::Message>(
-		std::make_shared<SocketMessages::Hello>()
+		std::make_shared<SocketMessages::HelloMessage>()
 	));
 
 	std::shared_ptr<SocketMessages::Message> hello = co_await ReceiveMessage();
-	if (hello->header.messageType != SocketMessages::MessageType::Hello)
+	if (hello->header.messageType != SocketMessages::MessageType::HelloMessage)
 		co_return false;
 
-	auto version = std::dynamic_pointer_cast<SocketMessages::Hello>(hello)->version;
+	auto version = std::dynamic_pointer_cast<SocketMessages::HelloMessage>(hello)->version;
 	if (version != CURRENT_VERSION)
 		co_return false;
 

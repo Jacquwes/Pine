@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "Message.h"
-#include "Hello.h"
+#include "HelloMessage.h"
 
 namespace SocketMessages
 {
@@ -19,18 +19,18 @@ namespace SocketMessages
 		switch (uint8_t messageType_ = buffer[0])
 		{
 			using enum SocketMessages::MessageType;
-		case static_cast<int>(Hello):
-			messageType = Hello;
-			if (bodySize != SocketMessages::Hello::size)
+		case static_cast<int>(HelloMessage):
+			messageType = HelloMessage;
+			if (bodySize != SocketMessages::HelloMessage::size)
 			{
-				messageType = Invalid;
+				messageType = InvalidMessage;
 			}
 			break;
-		case static_cast<int>(Login):
-			messageType = Login;
+		case static_cast<int>(LoginMessage):
+			messageType = LoginMessage;
 			break;
 		default:
-			messageType = Invalid;
+			messageType = InvalidMessage;
 			break;
 		}
 	}

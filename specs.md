@@ -46,14 +46,14 @@ Before that, the server will close the connection.
 
 | Type   | Description                     | Sent by |
 | ------ | ------------------------------- | --- |
-| `0x00` | Invalid                         | |
-| `0x01` | [ACK](#ack-message)             |  |
-| `0x02` | [Hello](#hello-message)         | , Client |
+| `0x00` | Invalid                         | Server |
+| `0x01` | [ACK](#ack-message)             | Server |
+| `0x02` | [Hello](#hello-message)         | Server, Client |
 | `0x03` | [Identify](#identify-message)   | Client |
 | `0x04` | [Keep alive](#keep-alive-message) | Client |
 | `0x05` | [Send chat message](#send-chat-message) | Client |
-| `0x06` | [Receive chat message](#send-chat-message) |  |
-| `0x07` | [Error](#error-message) |  |
+| `0x06` | [Receive chat message](#send-chat-message) | Server |
+| `0x07` | [Error](#error-message) | Server |
 
 ### ACK message
 

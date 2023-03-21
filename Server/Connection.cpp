@@ -189,7 +189,7 @@ AsyncOperation<bool> Connection::CheckVersion() const
 	if (hello->header.messageType != SocketMessages::MessageType::HelloMessage)
 		co_return false;
 
-	auto version = std::dynamic_pointer_cast<SocketMessages::HelloMessage>(hello)->version;
+	auto version = std::dynamic_pointer_cast<SocketMessages::HelloMessage>(hello)->GetVersion();
 	if (version != CurrentVersion)
 		co_return false;
 
@@ -207,7 +207,7 @@ AsyncOperation<bool> Connection::Identify()
 
 	auto&& identifyMessage = std::dynamic_pointer_cast<SocketMessages::IdentifyMessage>(message);
 	
-	m_user->m_username = std::bit_cast<char*>(identifyMessage->username.data());
+	m_user->m_username = identifyMessage->GetUsername();
 	m_user->m_isLoggedIn = true;
 
 	co_return true;

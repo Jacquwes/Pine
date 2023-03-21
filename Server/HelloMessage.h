@@ -6,7 +6,7 @@
 
 #include "Message.h"
 
-constexpr uint64_t CurrentVersion = 0x0;
+constexpr uint64_t CurrentVersion = 0x2;
 
 namespace SocketMessages
 {
@@ -15,30 +15,35 @@ namespace SocketMessages
 		HelloMessage()
 		{
 			header.messageType = MessageType::HelloMessage;
-			header.bodySize = size;
+			header.bodySize = GetBodySize();
 		}
 
 		bool ParseBody(std::vector<uint8_t> const& buffer) override
 		{
-			if (buffer.size() != size)
+			if (buffer.size() != GetBodySize())
 				return false;
 
-			std::memcpy(std::bit_cast<void*>(&version), std::bit_cast<void*>(buffer.data()), sizeof(version));
+			std::memcpy(std::bit_cast<void*>(&m_version), std::bit_cast<void*>(buffer.data()), sizeof(m_version));
 			return true;
 		}
-		
+
 		std::vector<uint8_t> Serialize() const override
 		{
-			std::vector<uint8_t> buffer;
-			buffer.append_range(header.Serialize());
+			std::vector<uint8_t> buffer(MessageHeader::size + GetBodySize(), 0);
+			std::vector<uint8_t> headerBuffer = header.Serialize();
 
-			buffer.resize(17);
-			std::memcpy(&buffer[9], &version, sizeof(version));
+			std::memcpy(&buffer[0], &headerBuffer[0], MessageHeader::size);
+			std::memcpy(&buffer[MessageHeader::size], &m_version, sizeof(m_version));
 
 			return buffer;
 		}
-		
-		uint64_t version = CurrentVersion;
-		static uint64_t const size = sizeof(version);
+
+		uint64_t GetBodySize() const final { return sizeof(m_version); }
+
+		constexpr uint64_t const& GetVersion() const { return m_version; }
+		constexpr void SetVersion(uint64_t const& version) { m_version = version; }
+
+	private:
+		uint64_t m_version{ CurrentVersion };
 	};
 }

@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstdint>
 #include <ostream>
+#include <type_traits>
 
 struct Snowflake
 {

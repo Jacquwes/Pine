@@ -149,10 +149,15 @@
     <ClCompile Include="User.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ACKMessage.h" />
     <ClInclude Include="Connection.h" />
+    <ClInclude Include="ErrorMessage.h" />
     <ClInclude Include="HelloMessage.h" />
     <ClInclude Include="IdentifyMessage.h" />
+    <ClInclude Include="KeepAliveMessage.h" />
     <ClInclude Include="Message.h" />
+    <ClInclude Include="ReceiveChatMessage.h" />
+    <ClInclude Include="SendChatMessage.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="Snowflake.h" />
     <ClInclude Include="SocketMessages.h" />

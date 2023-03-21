@@ -21,10 +21,6 @@ namespace SocketMessages
 			using enum SocketMessages::MessageType;
 		case static_cast<int>(HelloMessage):
 			messageType = HelloMessage;
-			if (bodySize != SocketMessages::HelloMessage::size)
-			{
-				messageType = InvalidMessage;
-			}
 			break;
 		case static_cast<int>(IdentifyMessage):
 			messageType = IdentifyMessage;
@@ -40,7 +36,11 @@ namespace SocketMessages
 		std::vector<uint8_t> buffer;
 		buffer.push_back(static_cast<uint8_t>(messageType));
 		buffer.resize(size);
-		std::memcpy(&buffer[1], &bodySize, sizeof(size));
+		// copy body size
+		std::memcpy(&buffer[sizeof(messageType)], &bodySize, sizeof(bodySize));
+		// copy message id
+		uint64_t id = messageId;
+		std::memcpy(&buffer[sizeof(messageType) + sizeof(bodySize)], &id, sizeof(id));
 		return buffer;
 	}
 
@@ -53,5 +53,10 @@ namespace SocketMessages
 	{
 		std::vector<uint8_t> buffer(MessageHeader::size, 0);
 		return buffer;
+	}
+
+	uint64_t Message::GetBodySize() const
+	{
+		return 0;
 	}
 }

@@ -71,5 +71,20 @@
     <ClInclude Include="User.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ACKMessage.h">
+      <Filter>Header Files\SocketMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="KeepAliveMessage.h">
+      <Filter>Header Files\SocketMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="SendChatMessage.h">
+      <Filter>Header Files\SocketMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="ReceiveChatMessage.h">
+      <Filter>Header Files\SocketMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorMessage.h">
+      <Filter>Header Files\SocketMessages</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

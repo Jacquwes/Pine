@@ -59,7 +59,7 @@ Before that, the server will close the connection.
 
 | Bytes | Description |
 |-------|-------------|
-| 64    | Acknowledged Message Id  |
+| 8    | Acknowledged Message Id  |
 
 ### Hello message
 

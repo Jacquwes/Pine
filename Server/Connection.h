@@ -35,7 +35,7 @@ private:
 
 	AsyncOperation<bool> EstablishConnection();
 	AsyncOperation<bool> CheckVersion() const;
-	AsyncOperation<bool> Login();
+	AsyncOperation<bool> Identify();
 	AsyncOperation<bool> ValidateConnection() const;
 
 	Snowflake m_id;

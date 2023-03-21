@@ -25,13 +25,13 @@
 |-------|-------------|
 | 1     | Message type |
 | 8     | Message Body length |
-| 64    | Message Id |
+| 8    | Message Id |
 | 0-XXXX   | Message data |
 
 ## Keep alive process
 
 Client should send a keep alive message every 5 seconds.
-If the  doesn't receive a keep alive message in 10 seconds, the connection will be closed.
+If the server doesn't receive a keep alive message in 10 seconds, the connection will be closed.
 
 ## Error handling
 

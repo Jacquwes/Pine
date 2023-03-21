@@ -10,7 +10,7 @@ namespace SocketMessages
 	{
 		InvalidMessage,
 		HelloMessage,
-		LoginMessage
+		IdentifyMessage,
 	};
 
 	struct MessageHeader

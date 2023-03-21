@@ -65,7 +65,7 @@
     <ClInclude Include="SocketMessages.h">
       <Filter>Header Files\SocketMessages</Filter>
     </ClInclude>
-    <ClInclude Include="LoginMessage.h">
+    <ClInclude Include="IdentifyMessage.h">
       <Filter>Header Files\SocketMessages</Filter>
     </ClInclude>
     <ClInclude Include="User.h">

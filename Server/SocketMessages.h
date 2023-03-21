@@ -1,5 +1,5 @@
 #pragma once
 
 #include "HelloMessage.h"
-#include "LoginMessage.h"
+#include "IdentifyMessage.h"
 #include "Message.h"

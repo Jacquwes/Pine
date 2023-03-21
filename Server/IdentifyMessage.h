@@ -11,11 +11,11 @@ constexpr uint64_t UsernameMaxLength = 0x20;
 
 namespace SocketMessages
 {
-	struct LoginMessage : Message
+	struct IdentifyMessage : Message
 	{
-		LoginMessage()
+		IdentifyMessage()
 		{
-			header.messageType = MessageType::LoginMessage;
+			header.messageType = MessageType:: IdentifyMessage;
 			header.bodySize = size;
 		}
 

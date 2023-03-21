@@ -115,11 +115,11 @@ AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMess
 		if (!std::dynamic_pointer_cast<SocketMessages::HelloMessage>(message)->ParseBody(body))
 			co_return message;
 	}
-	else if (header.messageType == SocketMessages::MessageType::LoginMessage)
+	else if (header.messageType == SocketMessages::MessageType::IdentifyMessage)
 	{
-		message = std::make_shared<SocketMessages::LoginMessage>();
+		message = std::make_shared<SocketMessages::IdentifyMessage>();
 
-		if (!std::dynamic_pointer_cast<SocketMessages::LoginMessage>(message)->ParseBody(body))
+		if (!std::dynamic_pointer_cast<SocketMessages::IdentifyMessage>(message)->ParseBody(body))
 			co_return message;
 	}
 	else
@@ -165,16 +165,14 @@ AsyncOperation<bool> Connection::EstablishConnection()
 
 	std::cout << "  Client passed version check: " << std::dec << m_id << std::endl;
 
-	if (!(co_await Login()))
+	if (!(co_await Identify()))
 	{
-		std::cout << "  Client failed login: " << std::dec << m_id << std::endl;
+		std::cout << "  Client failed identify: " << std::dec << m_id << std::endl;
 		m_server.DisconnectClient(m_id);
 		co_return false;
 	}
 
-	auto username = m_user->m_username;
-
-	std::cout << "  Client successfully logged in as \"" << m_user->m_username << "\": " << std::dec << m_id << std::endl;
+	std::cout << "  Client successfully identified in as \"" << m_user->m_username << "\": " << std::dec << m_id << std::endl;
 
 	co_return true;
 }
@@ -200,16 +198,16 @@ AsyncOperation<bool> Connection::CheckVersion() const
 
 
 
-AsyncOperation<bool> Connection::Login()
+AsyncOperation<bool> Connection::Identify()
 {
 	auto&& message = co_await ReceiveMessage();
 
-	if (message->header.messageType != SocketMessages::MessageType::LoginMessage)
+	if (message->header.messageType != SocketMessages::MessageType::IdentifyMessage)
 		co_return false;
 
-	auto&& loginMessage = std::dynamic_pointer_cast<SocketMessages::LoginMessage>(message);
+	auto&& identifyMessage = std::dynamic_pointer_cast<SocketMessages::IdentifyMessage>(message);
 	
-	m_user->m_username = std::bit_cast<char*>(loginMessage->username.data());
+	m_user->m_username = std::bit_cast<char*>(identifyMessage->username.data());
 	m_user->m_isLoggedIn = true;
 
 	co_return true;

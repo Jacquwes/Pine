@@ -4,13 +4,20 @@
 #include <memory>
 #include <vector>
 
+#include "Snowflake.h"
+
 namespace SocketMessages
 {
 	enum class MessageType : uint8_t
 	{
 		InvalidMessage,
+		AcknowledgeMessage,
 		HelloMessage,
 		IdentifyMessage,
+		KeepAliveMessage,
+		SendChatMessage,
+		ReceiveChatMessage,
+		Error,
 	};
 
 	struct MessageHeader
@@ -22,8 +29,9 @@ namespace SocketMessages
 
 		MessageType messageType{};
 		uint64_t bodySize{};
+		Snowflake messageId{};
 
-		static uint64_t constexpr size = sizeof(messageType) + sizeof(bodySize);
+		static uint64_t constexpr size = sizeof(messageType) + sizeof(bodySize) + sizeof(messageId.Value);
 	};
 
 	struct Message : std::enable_shared_from_this<Message>

@@ -26,8 +26,8 @@ namespace SocketMessages
 				messageType = InvalidMessage;
 			}
 			break;
-		case static_cast<int>(LoginMessage):
-			messageType = LoginMessage;
+		case static_cast<int>(IdentifyMessage):
+			messageType = IdentifyMessage;
 			break;
 		default:
 			messageType = InvalidMessage;
@@ -39,7 +39,7 @@ namespace SocketMessages
 	{
 		std::vector<uint8_t> buffer;
 		buffer.push_back(static_cast<uint8_t>(messageType));
-		buffer.resize(9);
+		buffer.resize(size);
 		std::memcpy(&buffer[1], &bodySize, sizeof(size));
 		return buffer;
 	}
@@ -51,7 +51,7 @@ namespace SocketMessages
 
 	std::vector<uint8_t> Message::Serialize() const
 	{
-		std::vector<uint8_t> buffer(9, 0);
+		std::vector<uint8_t> buffer(MessageHeader::size, 0);
 		return buffer;
 	}
 }

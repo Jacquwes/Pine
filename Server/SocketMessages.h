@@ -7,4 +7,4 @@
 #include "KeepAliveMessage.h"
 #include "Message.h"
 #include "ReceiveChatMessage.h"
-#include "ReceiveChatMessage.h"
+#include "SendChatMessage.h"

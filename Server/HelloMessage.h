@@ -22,6 +22,7 @@ namespace SocketMessages
 				return false;
 
 			std::memcpy(std::bit_cast<void*>(&m_version), std::bit_cast<void*>(buffer.data()), sizeof(m_version));
+
 			return true;
 		}
 

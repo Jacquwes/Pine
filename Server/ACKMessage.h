@@ -32,6 +32,7 @@ namespace SocketMessages
 			uint64_t id{};
 			std::memcpy(std::bit_cast<void*>(&id), std::bit_cast<void*>(buffer.data()), sizeof(id));
 			m_messageId = Snowflake(id);
+
 			return true;
 		}
 

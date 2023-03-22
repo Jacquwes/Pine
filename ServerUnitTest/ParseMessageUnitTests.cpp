@@ -32,5 +32,24 @@ namespace ServerUnitTest
 				L"Acknowledged message Id id wrong"
 			);
 		}
+
+		TEST_METHOD(ParseErrorMessage)
+		{
+			SocketMessages::ErrorCode errorCode{ SocketMessages::ErrorCode::InvalidMessage };
+
+			SocketMessages::ErrorMessage errorMessage{ errorCode };
+
+			std::vector<uint8_t> messageBuffer = errorMessage.Serialize();
+			std::vector<uint8_t> buffer(messageBuffer.begin() + SocketMessages::MessageHeader::size, messageBuffer.end());
+
+			Assert::IsFalse(errorMessage.ParseBody({ 0, 3, 4 }), L"Invalid data can be parsed");
+			Assert::IsTrue(errorMessage.ParseBody(buffer), L"Valid data can't be parsed");
+
+			Assert::AreEqual(
+				static_cast<uint8_t>(errorCode),
+				static_cast<uint8_t>(errorMessage.GetErrorCode()),
+				L"Error code is wrong"
+			);
+		}
 	};
 }

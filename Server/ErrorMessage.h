@@ -38,6 +38,8 @@ namespace SocketMessages
 			if (buffer.size() != GetBodySize())
 				return false;
 
+			std::memcpy(std::bit_cast<uint8_t*>(&m_errorCode), &buffer[0], sizeof(m_errorCode));
+
 			return true;
 		}
 

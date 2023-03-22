@@ -22,6 +22,9 @@ namespace SocketMessages
 			if (buffer.size() != GetBodySize())
 				return false;
 
+			std::memcpy(std::bit_cast<void*>(&m_usernameLength), std::bit_cast<void*>(buffer.data()), sizeof(m_usernameLength));
+			m_username = std::string(buffer.begin() + sizeof(m_usernameLength), buffer.end());
+
 			return true;
 		}
 

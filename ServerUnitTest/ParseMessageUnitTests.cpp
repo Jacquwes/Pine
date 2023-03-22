@@ -68,5 +68,22 @@ namespace ServerUnitTest
 				L"API version is wrong"
 			);
 		}
+
+		TEST_METHOD(ParseIdentifyMessage)
+		{
+			std::string username = "Username";
+			
+			SocketMessages::IdentifyMessage identifyMessage{};
+
+			identifyMessage.SetUsername(username);
+
+			std::vector<uint8_t> messageBuffer = identifyMessage.Serialize();
+			std::vector<uint8_t> buffer(messageBuffer.begin() + SocketMessages::MessageHeader::size, messageBuffer.end());
+
+			Assert::IsFalse(identifyMessage.ParseBody({ 0, 3, 4 }), L"Invalid data can be parsed");
+			Assert::IsTrue(identifyMessage.ParseBody(buffer), L"Valid data can't be parsed");
+
+			Assert::AreEqual(username, identifyMessage.GetUsername(), L"Username is wrong");
+		}
 	};
 }

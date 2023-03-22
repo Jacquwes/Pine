@@ -6,9 +6,6 @@
 
 #include "Message.h"
 
-constexpr uint64_t ChatMessageMinLength = 0x01;
-constexpr uint64_t ChatMessageMaxLength = 2000;
-
 namespace SocketMessages
 {
 	struct ReceiveChatMessage : Message

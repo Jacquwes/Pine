@@ -6,8 +6,6 @@
 
 #include "Message.h"
 
-constexpr uint64_t CurrentVersion = 0x2;
-
 namespace SocketMessages
 {
 	struct HelloMessage : Message

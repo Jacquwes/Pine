@@ -7,9 +7,6 @@
 
 #include "Message.h"
 
-constexpr uint64_t UsernameMinLength = 0x03;
-constexpr uint64_t UsernameMaxLength = 0x20;
-
 namespace SocketMessages
 {
 	struct IdentifyMessage : Message

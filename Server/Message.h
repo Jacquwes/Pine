@@ -6,6 +6,12 @@
 
 #include "Snowflake.h"
 
+constexpr uint64_t ChatMessageMinLength = 0x01;
+constexpr uint64_t ChatMessageMaxLength = 2000;
+constexpr uint64_t CurrentVersion = 0x2;
+constexpr uint64_t UsernameMinLength = 0x03;
+constexpr uint64_t UsernameMaxLength = 0x20;
+
 namespace SocketMessages
 {
 	enum class MessageType : uint8_t

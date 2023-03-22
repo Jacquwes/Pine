@@ -168,7 +168,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="MessageUnitTests.cpp" />
+    <ClCompile Include="ParseMessageUnitTests.cpp" />
+    <ClCompile Include="SerializeMessageUnitTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Server\Server.vcxproj">

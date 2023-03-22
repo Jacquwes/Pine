@@ -18,7 +18,7 @@ namespace SocketMessages
 		}
 
 		explicit AcknowledgeMessage(Snowflake const& id)
-			: m_messageId(id)
+			: m_messageId{ id }
 		{
 			header.messageType = MessageType::AcknowledgeMessage;
 			header.bodySize = GetBodySize();
@@ -29,7 +29,9 @@ namespace SocketMessages
 			if (buffer.size() != GetBodySize())
 				return false;
 
-			std::memcpy(std::bit_cast<void*>(&m_messageId), std::bit_cast<void*>(buffer.data()), sizeof(Snowflake::Value));
+			uint64_t id{};
+			std::memcpy(std::bit_cast<void*>(&id), std::bit_cast<void*>(buffer.data()), sizeof(id));
+			m_messageId = Snowflake(id);
 			return true;
 		}
 
@@ -39,8 +41,8 @@ namespace SocketMessages
 			std::vector<uint8_t> headerBuffer = header.Serialize();
 
 			std::memcpy(&buffer[0], &headerBuffer[0], MessageHeader::size);
-			uint64_t id = m_messageId;
-			std::memcpy(&buffer[SocketMessages::MessageHeader::size], &id, sizeof(id));
+			auto id = static_cast<uint64_t>(m_messageId);
+			std::memcpy(&buffer[MessageHeader::size], &id, sizeof(id));
 
 			return buffer;
 		}

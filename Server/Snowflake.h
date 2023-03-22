@@ -19,6 +19,14 @@ struct Snowflake
 			Value.sequence = 0;
 	}
 
+	explicit Snowflake(uint64_t const& id)
+	{
+		Value.timestamp = id >> 22;
+		Value.workerId = (id >> 17) & 0x1F;
+		Value.processId = (id >> 12) & 0x1F;
+		Value.sequence = id & 0xFFF;
+	}
+
 	struct
 	{
 		uint64_t timestamp : 42;

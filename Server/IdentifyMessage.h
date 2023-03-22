@@ -45,7 +45,7 @@ namespace SocketMessages
 			return sizeof(m_usernameLength) + m_usernameLength;
 		}
 
-		constexpr std::string const& GetUsername() const { return m_username; }
+		[[nodiscard]] constexpr std::string const& GetUsername() const { return m_username; }
 		constexpr bool SetUsername(std::string_view const& username)
 		{
 			if (username.length() < UsernameMinLength || username.length() > UsernameMaxLength)

@@ -54,7 +54,7 @@ namespace SocketMessages
 
 		uint64_t GetBodySize() const final { return sizeof(m_errorCode); }
 
-		constexpr ErrorCode const& GetErrorCode() const { return m_errorCode; }
+		[[nodiscard]] constexpr ErrorCode const& GetErrorCode() const { return m_errorCode; }
 		constexpr void SetErrorCode(ErrorCode const& errorCode) { m_errorCode = errorCode; }
 
 	private:

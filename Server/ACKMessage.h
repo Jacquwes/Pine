@@ -47,7 +47,7 @@ namespace SocketMessages
 
 		uint64_t GetBodySize() const final { return sizeof(Snowflake::Value); }
 
-		constexpr Snowflake const& GetAcknowledgedMessageId() const { return m_messageId; }
+		[[nodiscard]] constexpr Snowflake const& GetAcknowledgedMessageId() const { return m_messageId; }
 		void SetAcknowledgedMessageId(Snowflake const& acknowledgedMessageId) { m_messageId = acknowledgedMessageId; }
 
 	private:

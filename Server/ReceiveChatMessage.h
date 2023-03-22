@@ -55,7 +55,7 @@ namespace SocketMessages
 				+ m_chatMessageLength;
 		}
 
-		constexpr std::string const& GetAuthorUsername() const { return m_authorUsername; }
+		[[nodiscard]] constexpr std::string const& GetAuthorUsername() const { return m_authorUsername; }
 		constexpr bool SetAuthorUsername(std::string_view const& authorUsername)
 		{
 			if (authorUsername.length() < UsernameMinLength || authorUsername.length() > UsernameMaxLength)
@@ -69,7 +69,7 @@ namespace SocketMessages
 			return true;
 		}
 
-		constexpr std::string const& GetChatMessage() const { return m_chatMessage; }
+		[[nodiscard]] constexpr std::string const& GetChatMessage() const { return m_chatMessage; }
 		constexpr bool SetChatMessage(std::string_view const& chatMessage)
 		{
 			if (chatMessage.length() < ChatMessageMinLength || chatMessage.length() > ChatMessageMaxLength)

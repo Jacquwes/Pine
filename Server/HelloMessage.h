@@ -40,7 +40,7 @@ namespace SocketMessages
 
 		uint64_t GetBodySize() const final { return sizeof(m_version); }
 
-		constexpr uint64_t const& GetVersion() const { return m_version; }
+		[[nodiscard]] constexpr uint64_t const& GetVersion() const { return m_version; }
 		constexpr void SetVersion(uint64_t const& version) { m_version = version; }
 
 	private:

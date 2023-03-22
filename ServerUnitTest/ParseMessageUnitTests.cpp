@@ -85,5 +85,16 @@ namespace ServerUnitTest
 
 			Assert::AreEqual(username, identifyMessage.GetUsername(), L"Username is wrong");
 		}
+
+		TEST_METHOD(ParseKeepAliveMessage)
+		{
+			SocketMessages::KeepAliveMessage keepAliveMessage{};
+
+			std::vector<uint8_t> messageBuffer = keepAliveMessage.Serialize();
+			std::vector<uint8_t> buffer(messageBuffer.begin() + SocketMessages::MessageHeader::size, messageBuffer.end());
+
+			Assert::IsFalse(keepAliveMessage.ParseBody({ 0, 3, 4 }), L"Invalid data can be parsed");
+			Assert::IsTrue(keepAliveMessage.ParseBody(buffer), L"Valid data can't be parsed");
+		}
 	};
 }

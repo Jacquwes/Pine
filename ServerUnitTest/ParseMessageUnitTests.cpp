@@ -96,5 +96,24 @@ namespace ServerUnitTest
 			Assert::IsFalse(keepAliveMessage.ParseBody({ 0, 3, 4 }), L"Invalid data can be parsed");
 			Assert::IsTrue(keepAliveMessage.ParseBody(buffer), L"Valid data can't be parsed");
 		}
+
+		TEST_METHOD(ParseReceiveChatMessage)
+		{
+			std::string authorUsername = "Username";
+			std::string chatMessage = "Message";
+
+			SocketMessages::ReceiveChatMessage receiveChatMessage{};
+			receiveChatMessage.SetAuthorUsername(authorUsername);
+			receiveChatMessage.SetChatMessage(chatMessage);
+
+			std::vector<uint8_t> messageBuffer = receiveChatMessage.Serialize();
+			std::vector<uint8_t> buffer(messageBuffer.begin() + SocketMessages::MessageHeader::size, messageBuffer.end());
+
+			Assert::IsFalse(receiveChatMessage.ParseBody({ 0, 3, 4 }), L"Invalid data can be parsed");
+			Assert::IsTrue(receiveChatMessage.ParseBody(buffer), L"Valid data can't be parsed");
+
+			Assert::AreEqual(authorUsername, receiveChatMessage.GetAuthorUsername(), L"Author username is wrong");
+			Assert::AreEqual(chatMessage, receiveChatMessage.GetChatMessage(), L"Chat message is wrong");
+		}
 	};
 }

@@ -21,6 +21,28 @@ namespace SocketMessages
 			if (buffer.size() != GetBodySize())
 				return false;
 
+			std::memcpy(
+				std::bit_cast<uint8_t*>(&m_authorUsernameLength),
+				buffer.data(),
+				sizeof(m_authorUsernameLength)
+			);
+			m_authorUsername = std::string(
+				buffer.begin() + sizeof(m_authorUsernameLength),
+				buffer.begin() + sizeof(m_authorUsernameLength) + m_authorUsernameLength
+			);
+
+			std::memcpy(
+				std::bit_cast<uint16_t*>(&m_chatMessageLength),
+				buffer.data() + sizeof(m_authorUsernameLength) + m_authorUsernameLength,
+				sizeof(m_chatMessageLength)
+			);
+			m_chatMessage = std::string(
+				buffer.begin() + sizeof(m_authorUsernameLength) + m_authorUsernameLength + sizeof(m_chatMessageLength),
+				buffer.end()
+			);
+
+			header.bodySize = GetBodySize();
+
 			return true;
 		}
 

@@ -23,6 +23,13 @@ namespace SocketMessages
 			if (buffer.size() != GetBodySize())
 				return false;
 
+			std::memcpy(std::bit_cast<uint8_t*>(&m_chatMessageLength),
+						buffer.data(), sizeof(m_chatMessageLength));
+			m_chatMessage = std::string(buffer.begin() + sizeof(m_chatMessageLength),
+										buffer.begin() + sizeof(m_chatMessageLength) + m_chatMessageLength);
+
+			header.bodySize = GetBodySize();
+
 			return true;
 		}
 
@@ -30,9 +37,9 @@ namespace SocketMessages
 		{
 			std::vector<uint8_t> buffer(MessageHeader::size + GetBodySize(), 0);
 			std::vector<uint8_t> headerBuffer = header.Serialize();
-			
+
 			uint8_t cursor = 0;
-			
+
 			std::memcpy(&buffer[cursor], &headerBuffer[0], MessageHeader::size);
 			cursor += MessageHeader::size;
 			std::memcpy(&buffer[cursor], &m_chatMessageLength, sizeof(m_chatMessageLength));
@@ -44,21 +51,7 @@ namespace SocketMessages
 
 		uint64_t constexpr GetBodySize() const final
 		{
-			return sizeof(m_authorUsenameLength) + m_authorUsenameLength + sizeof(m_chatMessageLength) + m_chatMessageLength;
-		}
-
-		[[nodiscard]] constexpr std::string const& GetAuthorUsername() const { return m_authorUsername; }
-		constexpr bool SetAuthorUsername(std::string_view const& authorUsername)
-		{
-			if (authorUsername.size() > UsernameMaxLength || authorUsername.size() < UsernameMinLength)
-				return false;
-
-			m_authorUsername = authorUsername;
-			m_authorUsenameLength = static_cast<uint8_t>(authorUsername.size());
-
-			header.bodySize = GetBodySize();
-
-			return true;
+			return sizeof(m_chatMessageLength) + m_chatMessageLength;
 		}
 
 		[[nodiscard]] constexpr std::string const& GetChatMessage() const { return m_chatMessage; }
@@ -76,8 +69,6 @@ namespace SocketMessages
 		}
 
 	private:
-		uint8_t m_authorUsenameLength{};
-		std::string m_authorUsername{};
 		uint16_t m_chatMessageLength{};
 		std::string m_chatMessage{};
 	};

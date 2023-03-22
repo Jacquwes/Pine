@@ -154,14 +154,6 @@ namespace ServerUnitTest
 		{
 			SocketMessages::SendChatMessage message{};
 
-			std::string validUsername = "Username";
-			std::string invalidUsername1 = "0";
-			std::string invalidUsername2 = "012345678901234567890123456789012";
-
-			Assert::IsTrue(message.SetAuthorUsername(validUsername), L"Valid username can't be set");
-			Assert::IsFalse(message.SetAuthorUsername(invalidUsername1), L"Short username can be set");
-			Assert::IsFalse(message.SetAuthorUsername(invalidUsername2), L"Long username can be set");
-
 			std::string validMessage = "Message";
 			std::string invalidMessage1 = "";
 			std::string invalidMessage2(2001, 'a');

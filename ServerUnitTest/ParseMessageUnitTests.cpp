@@ -115,5 +115,21 @@ namespace ServerUnitTest
 			Assert::AreEqual(authorUsername, receiveChatMessage.GetAuthorUsername(), L"Author username is wrong");
 			Assert::AreEqual(chatMessage, receiveChatMessage.GetChatMessage(), L"Chat message is wrong");
 		}
+
+		TEST_METHOD(ParseSendChatMessage)
+		{
+			std::string chatMessage = "Message";
+
+			SocketMessages::SendChatMessage sendChatMessage{};
+			sendChatMessage.SetChatMessage(chatMessage);
+
+			std::vector<uint8_t> messageBuffer = sendChatMessage.Serialize();
+			std::vector<uint8_t> buffer(messageBuffer.begin() + SocketMessages::MessageHeader::size, messageBuffer.end());
+
+			Assert::IsFalse(sendChatMessage.ParseBody({ 0, 3, 4 }), L"Invalid data can be parsed");
+			Assert::IsTrue(sendChatMessage.ParseBody(buffer), L"Valid data can't be parsed");
+
+			Assert::AreEqual(chatMessage, sendChatMessage.GetChatMessage(), L"Chat message is wrong");
+		}
 	};
 }

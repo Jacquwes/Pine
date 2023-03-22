@@ -29,6 +29,6 @@ namespace SocketMessages
 			return header.Serialize();
 		}
 
-		uint64_t GetBodySize() const override { return 0; }
+		uint64_t GetBodySize() const final { return 0; }
 	};
 }

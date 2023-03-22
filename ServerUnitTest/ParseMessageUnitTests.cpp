@@ -51,5 +51,22 @@ namespace ServerUnitTest
 				L"Error code is wrong"
 			);
 		}
+
+		TEST_METHOD(ParseHelloMessage)
+		{
+			SocketMessages::HelloMessage helloMessage{};
+
+			std::vector<uint8_t> messageBuffer = helloMessage.Serialize();
+			std::vector<uint8_t> buffer(messageBuffer.begin() + SocketMessages::MessageHeader::size, messageBuffer.end());
+
+			Assert::IsFalse(helloMessage.ParseBody({ 0, 3, 4 }), L"Invalid data can be parsed");
+			Assert::IsTrue(helloMessage.ParseBody(buffer), L"Valid data can't be parsed");
+
+			Assert::AreEqual(
+				static_cast<uint8_t>(CurrentVersion),
+				static_cast<uint8_t>(helloMessage.GetVersion()),
+				L"API version is wrong"
+			);
+		}
 	};
 }

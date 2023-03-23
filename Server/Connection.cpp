@@ -44,7 +44,7 @@ AsyncTask Connection::Listen()
 		if (!m_disconnecting)
 		{
 			m_disconnecting = true;
-		m_server.DisconnectClient(m_id);
+			m_server.DisconnectClient(m_id);
 		}
 		co_return;
 	}
@@ -113,22 +113,43 @@ AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMess
 
 	std::vector<uint8_t> body = co_await ReceiveRawMessage(header.bodySize);
 
-	if (header.messageType == SocketMessages::MessageType::HelloMessage)
+
+	switch (header.messageType)
 	{
+		using namespace SocketMessages;
+
+	case MessageType::HelloMessage:
 		message = std::make_shared<SocketMessages::HelloMessage>();
 
 		if (!std::dynamic_pointer_cast<SocketMessages::HelloMessage>(message)->ParseBody(body))
 			co_return message;
-	}
-	else if (header.messageType == SocketMessages::MessageType::IdentifyMessage)
-	{
+		break;
+
+	case MessageType::IdentifyMessage:
 		message = std::make_shared<SocketMessages::IdentifyMessage>();
 
 		if (!std::dynamic_pointer_cast<SocketMessages::IdentifyMessage>(message)->ParseBody(body))
 			co_return message;
-	}
-	else
+		break;
+
+	case MessageType::KeepAliveMessage:
+		message = std::make_shared<SocketMessages::KeepAliveMessage>();
+
+		if (!std::dynamic_pointer_cast<SocketMessages::KeepAliveMessage>(message)->ParseBody(body))
+			co_return message;
+		break;
+
+	case MessageType::SendChatMessage:
+		message = std::make_shared<SocketMessages::SendChatMessage>();
+
+		if (!std::dynamic_pointer_cast<SocketMessages::SendChatMessage>(message)->ParseBody(body))
+			co_return message;
+		break;
+
+	default:
 		co_return message;
+		break;
+	}
 
 	message->header = header;
 
@@ -209,7 +230,7 @@ AsyncOperation<bool> Connection::Identify()
 		co_return false;
 
 	auto&& identifyMessage = std::dynamic_pointer_cast<SocketMessages::IdentifyMessage>(message);
-	
+
 	m_user->m_username = identifyMessage->GetUsername();
 	m_user->m_isLoggedIn = true;
 

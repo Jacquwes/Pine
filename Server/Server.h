@@ -1,5 +1,6 @@
 #pragma once
 
+#include <condition_variable>
 #include <deque>
 #include <thread>
 #include <memory>
@@ -26,6 +27,7 @@ public:
 	AsyncTask OnConnect(std::shared_ptr<Connection> const& client) const;
 	AsyncTask OnMessage(std::shared_ptr<Connection> const& client, std::shared_ptr<SocketMessages::Message> const&);
 
+#ifndef MS_CPP_UNITTESTFRAMEWORK
 private:
 #endif
 	std::condition_variable m_cv;

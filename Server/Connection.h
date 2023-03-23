@@ -32,8 +32,10 @@ public:
 
 	[[nodiscard]] constexpr bool const& IsDisconnecting() const noexcept { return m_disconnecting; }
 	constexpr void SetDisconnecting(bool const& disconnecting) noexcept { m_disconnecting = disconnecting; }
-	
+
+#ifndef MS_CPP_UNITTESTFRAMEWORK
 private:
+#endif
 	AsyncOperation<std::vector<uint8_t>> ReceiveRawMessage(uint64_t const& bufferSize) const;
 	AsyncTask SendRawMessage(std::vector<uint8_t> const& buffer) const;
 

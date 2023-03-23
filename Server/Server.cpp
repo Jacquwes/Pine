@@ -75,7 +75,6 @@ AsyncTask Server::DisconnectClient(Snowflake clientId)
 {
 	std::unique_lock lock{ m_disconnectMutex };
 
-	co_await SwitchThread(m_thread); // Allow the connection thread to end
 
 	auto client = std::ranges::find_if(m_clients, [clientId](auto const& potentialClient)
 									   {
@@ -88,17 +87,17 @@ AsyncTask Server::DisconnectClient(Snowflake clientId)
 		closesocket((*client)->GetSocket());
 		shutdown((*client)->GetSocket(), SD_BOTH);
 
-	if ((*client)->GetThread().joinable())
+		if ((*client)->GetThread().joinable())
 		{
 			(*client)->GetThread().request_stop();
-		(*client)->GetThread().join();
+			(*client)->GetThread().join();
 		}
 
-	m_clients.erase(client);
-}
+		m_clients.erase(client);
+	}
 
 	m_cv.notify_all();
-	lock.unlock(); ///////////////////////////////////// fails here
+	lock.unlock();
 	lock.release();
 
 	co_return;

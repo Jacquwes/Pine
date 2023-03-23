@@ -12,6 +12,7 @@
 
 
 
+
 Connection::Connection(SOCKET socket, Server& server)
 	: m_server{ server }
 	, m_socket{ socket }
@@ -40,7 +41,11 @@ AsyncTask Connection::Listen()
 
 	if (!(co_await EstablishConnection()))
 	{
+		if (!m_disconnecting)
+		{
+			m_disconnecting = true;
 		m_server.DisconnectClient(m_id);
+		}
 		co_return;
 	}
 
@@ -159,7 +164,6 @@ AsyncOperation<bool> Connection::EstablishConnection()
 	if (!(co_await CheckVersion()))
 	{
 		std::cout << "  Client failed version check: " << std::dec << m_id << std::endl;
-		m_server.DisconnectClient(m_id);
 		co_return false;
 	}
 
@@ -168,7 +172,6 @@ AsyncOperation<bool> Connection::EstablishConnection()
 	if (!(co_await Identify()))
 	{
 		std::cout << "  Client failed identify: " << std::dec << m_id << std::endl;
-		m_server.DisconnectClient(m_id);
 		co_return false;
 	}
 

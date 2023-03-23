@@ -21,9 +21,21 @@ void Server::Run(std::string_view const& port)
 	std::cout << "Pine - version " << std::hex << CurrentVersion << "\nServer Listening" << std::endl;
 
 	m_stop = false;
+	bool firstLoop = true;
+
 	while (!m_stop)
 	{
+		if (firstLoop)
+		{
+			firstLoop = false;
+			m_cv.notify_one();
+		}
+
 		SOCKET clientSocket = accept(m_socket, nullptr, nullptr);
+		
+		if (m_stop)
+			break;
+
 		if (clientSocket == INVALID_SOCKET)
 		{
 			closesocket(m_socket);
@@ -33,7 +45,7 @@ void Server::Run(std::string_view const& port)
 
 		auto client = std::make_shared<Connection>(clientSocket, *this);
 		client->Listen();
-		m_clients.push_back(std::move(client));
+		m_clients.push_back(std::move(client)); // TODO: Make sure this is safe
 	}
 
 	std::cout << "Socket stops listening" << std::endl;
@@ -44,33 +56,52 @@ void Server::Run(std::string_view const& port)
 void Server::Stop()
 {
 	m_stop = true;
+
+	for (auto const& client : m_clients)
+	{
+		if (!client->IsDisconnecting())
+			DisconnectClient(client->GetId());
+	}
+	
+	shutdown(m_socket, SD_BOTH);
 	closesocket(m_socket);
 	WSACleanup();
+	m_cv.notify_one();
 }
 
 
 
 AsyncTask Server::DisconnectClient(Snowflake clientId)
 {
-	if (m_thread.joinable())
-	{
-		m_thread.request_stop();
-		m_thread.join();
-	}
+	std::unique_lock lock{ m_disconnectMutex };
 
 	co_await SwitchThread(m_thread); // Allow the connection thread to end
 
-	auto client = std::ranges::find_if(std::ranges::begin(m_clients), std::ranges::end(m_clients), [clientId](auto const& potentialClient)
+	auto client = std::ranges::find_if(m_clients, [clientId](auto const& potentialClient)
 									   {
 										   return potentialClient->GetId() == clientId;
 									   });
 
-	if (client == m_clients.end())
-		throw ServerException{ "Trying to disconnect inexistent client." };
+	if (client != m_clients.end())
+	{
+		(*client)->SetDisconnecting(true);
+		closesocket((*client)->GetSocket());
+		shutdown((*client)->GetSocket(), SD_BOTH);
 
 	if ((*client)->GetThread().joinable())
+		{
+			(*client)->GetThread().request_stop();
 		(*client)->GetThread().join();
+		}
+
 	m_clients.erase(client);
+}
+
+	m_cv.notify_all();
+	lock.unlock(); ///////////////////////////////////// fails here
+	lock.release();
+
+	co_return;
 }
 
 

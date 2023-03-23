@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Connection.cpp" />
+    <ClCompile Include="Coroutine.cpp" />
     <ClCompile Include="Coroutine.h" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="ServerException.h" />

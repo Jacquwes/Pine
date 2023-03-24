@@ -19,7 +19,8 @@ namespace SocketMessages
 
 		bool ParseBody(std::vector<uint8_t> const& buffer) override
 		{
-			if (buffer.size() != GetBodySize())
+			if (buffer.size() < sizeof(m_usernameLength) + UsernameMinLength
+				|| buffer.size() > sizeof(m_usernameLength) + UsernameMaxLength)
 				return false;
 
 			std::memcpy(std::bit_cast<void*>(&m_usernameLength), std::bit_cast<void*>(buffer.data()), sizeof(m_usernameLength));

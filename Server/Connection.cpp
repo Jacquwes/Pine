@@ -99,7 +99,7 @@ AsyncTask Connection::SendRawMessage(std::vector<uint8_t> const& buffer) const
 
 
 
-AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMessage() const
+AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMessage()
 {
 	auto message = std::make_shared<SocketMessages::Message>();
 
@@ -116,33 +116,47 @@ AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMess
 
 	switch (header.messageType)
 	{
-		using namespace SocketMessages;
+		using enum SocketMessages::MessageType;
 
-	case MessageType::HelloMessage:
+	case AcknowledgeMessage:
+		message = std::make_shared<SocketMessages::AcknowledgeMessage>();
+
+		if (!std::dynamic_pointer_cast<SocketMessages::AcknowledgeMessage>(message)->ParseBody(body))
+			co_return message;
+		break;
+
+	case HelloMessage:
 		message = std::make_shared<SocketMessages::HelloMessage>();
 
 		if (!std::dynamic_pointer_cast<SocketMessages::HelloMessage>(message)->ParseBody(body))
 			co_return message;
 		break;
 
-	case MessageType::IdentifyMessage:
+	case IdentifyMessage:
 		message = std::make_shared<SocketMessages::IdentifyMessage>();
 
 		if (!std::dynamic_pointer_cast<SocketMessages::IdentifyMessage>(message)->ParseBody(body))
 			co_return message;
 		break;
 
-	case MessageType::KeepAliveMessage:
+	case KeepAliveMessage:
 		message = std::make_shared<SocketMessages::KeepAliveMessage>();
 
 		if (!std::dynamic_pointer_cast<SocketMessages::KeepAliveMessage>(message)->ParseBody(body))
 			co_return message;
 		break;
 
-	case MessageType::SendChatMessage:
+	case SendChatMessage:
 		message = std::make_shared<SocketMessages::SendChatMessage>();
 
 		if (!std::dynamic_pointer_cast<SocketMessages::SendChatMessage>(message)->ParseBody(body))
+			co_return message;
+		break;
+
+	case ReceiveChatMessage:
+		message = std::make_shared<SocketMessages::ReceiveChatMessage>();
+
+		if (!std::dynamic_pointer_cast<SocketMessages::ReceiveChatMessage>(message)->ParseBody(body))
 			co_return message;
 		break;
 
@@ -151,7 +165,10 @@ AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMess
 		break;
 	}
 
+
 	message->header = header;
+
+	m_lastMessageId = message->header.messageId;
 
 	co_return message;
 }
@@ -160,12 +177,7 @@ AsyncOperation<std::shared_ptr<SocketMessages::Message>> Connection::ReceiveMess
 
 AsyncTask Connection::SendMessage(std::shared_ptr<SocketMessages::Message> const& message) const
 {
-	std::vector<uint8_t> buffer;
-
-	if (message->header.messageType == SocketMessages::MessageType::HelloMessage)
-		buffer = std::dynamic_pointer_cast<SocketMessages::HelloMessage>(message)->Serialize();
-	else
-		throw ServerException{ "Trying to send unknown message type." };
+	std::vector<uint8_t> buffer = message->Serialize();
 
 	co_await SendRawMessage(buffer);
 }
@@ -188,6 +200,8 @@ AsyncOperation<bool> Connection::EstablishConnection()
 		co_return false;
 	}
 
+	co_await SendAck();
+
 	std::cout << "  Client passed version check: " << std::dec << m_id << std::endl;
 
 	if (!(co_await Identify()))
@@ -196,6 +210,8 @@ AsyncOperation<bool> Connection::EstablishConnection()
 		co_return false;
 	}
 
+	co_await SendAck();
+
 	std::cout << "  Client successfully identified in as \"" << m_user->m_username << "\": " << std::dec << m_id << std::endl;
 
 	co_return true;
@@ -203,13 +219,11 @@ AsyncOperation<bool> Connection::EstablishConnection()
 
 
 
-AsyncOperation<bool> Connection::CheckVersion() const
+AsyncOperation<bool> Connection::CheckVersion()
 {
-	co_await SendMessage(std::static_pointer_cast<SocketMessages::Message>(
-		std::make_shared<SocketMessages::HelloMessage>()
-	));
+	co_await SendMessage(std::make_shared<SocketMessages::HelloMessage>());
 
-	std::shared_ptr<SocketMessages::Message> hello = co_await ReceiveMessage();
+	auto&& hello = co_await ReceiveMessage();
 	if (hello->header.messageType != SocketMessages::MessageType::HelloMessage)
 		co_return false;
 
@@ -262,4 +276,10 @@ AsyncOperation<bool> Connection::ValidateConnection() const
 	if (std::ranges::equal(keyBuffer, response))
 		co_return true;
 	co_return false;
+}
+
+AsyncTask Connection::SendAck() const
+{
+	auto message = std::make_shared<SocketMessages::AcknowledgeMessage>(m_lastMessageId);
+	co_await SendMessage(message);
 }

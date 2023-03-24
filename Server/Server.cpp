@@ -45,7 +45,9 @@ void Server::Run(std::string_view const& port)
 
 		auto client = std::make_shared<Connection>(clientSocket, *this);
 		client->Listen();
-		m_clients.push_back(std::move(client)); // TODO: Make sure this is safe
+
+		std::unique_lock lock{ m_mutateClients };
+		m_clients.push_back(std::move(client));
 	}
 
 	std::cout << "Socket stops listening" << std::endl;
@@ -73,7 +75,7 @@ void Server::Stop()
 
 AsyncTask Server::DisconnectClient(Snowflake clientId)
 {
-	std::unique_lock lock{ m_disconnectMutex };
+	std::unique_lock lock{ m_mutateClients };
 
 
 	auto client = std::ranges::find_if(m_clients, [clientId](auto const& potentialClient)

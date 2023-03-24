@@ -31,7 +31,7 @@ public:
 private:
 #endif
 	std::condition_variable m_cv;
-	std::mutex m_disconnectMutex;
+	std::mutex m_mutateClients;
 
 	bool InitSocket(std::string_view const& port);
 

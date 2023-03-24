@@ -18,17 +18,44 @@ namespace SocketMessages
 
 		switch (uint8_t messageType_ = buffer[0])
 		{
-			using enum SocketMessages::MessageType;
+			using enum MessageType;
+
+		case static_cast<int>(AcknowledgeMessage):
+			messageType = AcknowledgeMessage;
+			break;
+
 		case static_cast<int>(HelloMessage):
 			messageType = HelloMessage;
 			break;
+
 		case static_cast<int>(IdentifyMessage):
 			messageType = IdentifyMessage;
 			break;
+
+		case static_cast<int>(KeepAliveMessage):
+			messageType = KeepAliveMessage;
+			break;
+
+		case static_cast<int>(SendChatMessage):
+			messageType = SendChatMessage;
+			break;
+
+		case static_cast<int>(ReceiveChatMessage):
+			messageType = ReceiveChatMessage;
+			break;
+
+		case static_cast<int>(ErrorMessage):
+			messageType = ErrorMessage;
+			break;
+
 		default:
 			messageType = InvalidMessage;
 			break;
 		}
+
+		uint64_t id;
+		std::memcpy(&id, &buffer[sizeof(messageType) + sizeof(bodySize)], sizeof(id));
+		messageId = Snowflake{ id };
 	}
 
 	std::vector<uint8_t> MessageHeader::Serialize() const

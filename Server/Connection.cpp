@@ -246,7 +246,6 @@ AsyncOperation<bool> Connection::Identify()
 	auto&& identifyMessage = std::dynamic_pointer_cast<SocketMessages::IdentifyMessage>(message);
 
 	m_user->m_username = identifyMessage->GetUsername();
-	m_user->m_isLoggedIn = true;
 
 	co_return true;
 }

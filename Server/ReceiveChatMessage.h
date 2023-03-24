@@ -18,18 +18,29 @@ namespace SocketMessages
 
 		bool ParseBody(std::vector<uint8_t> const& buffer) override
 		{
-			if (buffer.size() != GetBodySize())
+			if (buffer.size() < sizeof(m_authorUsernameLength) + UsernameMinLength + sizeof(m_chatMessageLength) + ChatMessageMinLength)
+				return false;
+
+			if (buffer.size() > sizeof(m_authorUsernameLength) + UsernameMaxLength + sizeof(m_chatMessageLength) + ChatMessageMaxLength)
 				return false;
 
 			std::memcpy(std::bit_cast<uint8_t*>(&m_authorUsernameLength),
 						buffer.data(),
 						sizeof(m_authorUsernameLength));
+
+			if (buffer.size() < sizeof(m_authorUsernameLength) + m_authorUsernameLength + sizeof(m_chatMessageLength) + ChatMessageMinLength)
+				return false;
+
 			m_authorUsername = std::string(buffer.begin() + sizeof(m_authorUsernameLength),
 										   buffer.begin() + sizeof(m_authorUsernameLength) + m_authorUsernameLength);
 
 			std::memcpy(std::bit_cast<uint16_t*>(&m_chatMessageLength),
 						buffer.data() + sizeof(m_authorUsernameLength) + m_authorUsernameLength,
 						sizeof(m_chatMessageLength));
+
+			if (buffer.size() != sizeof(m_authorUsernameLength) + m_authorUsernameLength + sizeof(m_chatMessageLength) + m_chatMessageLength)
+				return false;
+
 			m_chatMessage = std::string(buffer.begin() + sizeof(m_authorUsernameLength) + m_authorUsernameLength + sizeof(m_chatMessageLength),
 										buffer.end());
 

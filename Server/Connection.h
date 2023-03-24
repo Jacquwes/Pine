@@ -17,7 +17,7 @@ class Server;
 class Connection : public std::enable_shared_from_this<Connection>
 {
 public:
-	Connection(SOCKET socket, Server& server);
+	Connection(SOCKET socket, Server& server, bool serverConnection = true);
 	~Connection();
 
 	AsyncTask Listen();
@@ -36,6 +36,8 @@ public:
 	[[nodiscard]] constexpr bool const& IsDisconnecting() const noexcept { return m_disconnecting; }
 	constexpr void SetDisconnecting(bool const& disconnecting) noexcept { m_disconnecting = disconnecting; }
 
+	AsyncTask SendAck() const;
+
 private:
 
 	AsyncOperation<bool> EstablishConnection();
@@ -43,13 +45,13 @@ private:
 	AsyncOperation<bool> Identify();
 	AsyncOperation<bool> ValidateConnection() const;
 
-	AsyncTask SendAck() const;
-
 	Snowflake m_id;
 	Snowflake m_lastMessageId;
 	Server& m_server;
 	SOCKET m_socket;
 	std::shared_ptr<User> m_user{ std::make_shared<User>() };
 	std::jthread m_thread;
+
 	bool m_disconnecting{ false };
+	bool m_serverConnection{ true };
 };

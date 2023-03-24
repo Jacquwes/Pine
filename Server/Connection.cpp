@@ -13,9 +13,10 @@
 
 
 
-Connection::Connection(SOCKET socket, Server& server)
+Connection::Connection(SOCKET socket, Server& server, bool serverConnection)
 	: m_server{ server }
 	, m_socket{ socket }
+	, m_serverConnection{ serverConnection }
 {
 	std::cout << "New client trying to connect: " << std::dec << m_id << std::endl;
 }
@@ -77,6 +78,13 @@ AsyncOperation<std::vector<uint8_t>> Connection::ReceiveRawMessage(uint64_t cons
 	int n = recv(m_socket, std::bit_cast<char*>(buffer.data()), static_cast<int>(bufferSize), 0);
 	if (n == SOCKET_ERROR)
 	{
+		int error = WSAGetLastError();
+
+		if (error == WSAECONNRESET || error == WSAECONNABORTED && m_serverConnection)
+		{
+			co_return buffer;
+		}
+
 		throw ServerException{ "Failed to receive message: " + WSAGetLastError() };
 	}
 

@@ -25,7 +25,7 @@ public:
 	AsyncTask DisconnectClient(Snowflake clientId);
 	AsyncTask MessageClient(std::shared_ptr<Connection> const& client, std::shared_ptr<SocketMessages::Message> const& message) const;
 	AsyncTask OnConnect(std::shared_ptr<Connection> const& client) const;
-	AsyncTask OnMessage(std::shared_ptr<Connection> const& client, std::shared_ptr<SocketMessages::Message> const&);
+	AsyncTask OnMessage(std::shared_ptr<Connection> client, std::shared_ptr<SocketMessages::Message> message);
 
 #ifndef MS_CPP_UNITTESTFRAMEWORK
 private:

@@ -83,7 +83,7 @@ AsyncTask Server::DisconnectClient(Snowflake clientId)
 										   return potentialClient->GetId() == clientId;
 									   });
 
-	if (client != m_clients.end())
+	if (client != m_clients.end() && !(*client)->IsDisconnecting())
 	{
 		(*client)->SetDisconnecting(true);
 		closesocket((*client)->GetSocket());
@@ -99,8 +99,6 @@ AsyncTask Server::DisconnectClient(Snowflake clientId)
 	}
 
 	m_cv.notify_all();
-	lock.unlock();
-	lock.release();
 
 	co_return;
 }

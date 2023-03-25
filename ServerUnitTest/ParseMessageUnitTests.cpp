@@ -72,7 +72,7 @@ namespace ServerUnitTest
 		TEST_METHOD(ParseIdentifyMessage)
 		{
 			std::string username = "Username";
-			
+
 			SocketMessages::IdentifyMessage identifyMessage{};
 
 			identifyMessage.SetUsername(username);
@@ -118,10 +118,10 @@ namespace ServerUnitTest
 
 		TEST_METHOD(ParseSendChatMessage)
 		{
-			std::string chatMessage = "Message";
+			std::string validChatMessage = "Message";
 
 			SocketMessages::SendChatMessage sendChatMessage{};
-			sendChatMessage.SetChatMessage(chatMessage);
+			sendChatMessage.SetChatMessage(validChatMessage);
 
 			std::vector<uint8_t> messageBuffer = sendChatMessage.Serialize();
 			std::vector<uint8_t> buffer(messageBuffer.begin() + SocketMessages::MessageHeader::size, messageBuffer.end());
@@ -129,7 +129,7 @@ namespace ServerUnitTest
 			Assert::IsFalse(sendChatMessage.ParseBody({ 0, 3, 4 }), L"Invalid data can be parsed");
 			Assert::IsTrue(sendChatMessage.ParseBody(buffer), L"Valid data can't be parsed");
 
-			Assert::AreEqual(chatMessage, sendChatMessage.GetChatMessage(), L"Chat message is wrong");
+			Assert::AreEqual(validChatMessage, sendChatMessage.GetChatMessage(), L"Chat message is wrong");
 		}
 	};
 }

@@ -26,6 +26,10 @@ namespace SocketMessages
 
 			std::memcpy(std::bit_cast<uint8_t*>(&m_chatMessageLength),
 						buffer.data(), sizeof(m_chatMessageLength));
+
+			if (buffer.size() != sizeof(m_chatMessageLength) + m_chatMessageLength)
+				return false;
+
 			m_chatMessage = std::string(buffer.begin() + sizeof(m_chatMessageLength),
 										buffer.begin() + sizeof(m_chatMessageLength) + m_chatMessageLength);
 

@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shared", "Shared\Shared.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerUnitTest", "ServerUnitTest\ServerUnitTest.vcxproj", "{B53D4CAB-38CB-4597-AF97-D37FCCDD5D14}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PineServer", "PineServer\PineServer.vcxproj", "{D3C781E2-F6E0-4334-BD33-5A514E22C366}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM

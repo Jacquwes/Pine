@@ -151,10 +151,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ClientConnection.cpp" />
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="Coroutine.cpp" />
     <ClCompile Include="Coroutine.h" />
     <ClCompile Include="Message.cpp" />
+    <ClCompile Include="ServerConnection.cpp" />
     <ClCompile Include="ServerException.h" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="ServerOnMessage.cpp" />

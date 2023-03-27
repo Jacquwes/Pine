@@ -31,7 +31,7 @@ AsyncTask Server::OnMessage(std::shared_ptr<Connection> client, std::shared_ptr<
 	{
 		std::cout << "  Received chat message from client: " << std::dec << client->GetId() << std::endl;
 		auto receiveChat = std::make_shared<SocketMessages::ReceiveChatMessage>();
-		receiveChat->SetAuthorUsername(client->GetUser()->GetUsername());
+		receiveChat->SetAuthorUsername(client->GetUser().GetUsername());
 		receiveChat->SetChatMessage(std::dynamic_pointer_cast<SocketMessages::SendChatMessage>(message)->GetChatMessage());
 
 		co_await client->SendAck();

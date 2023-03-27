@@ -15,7 +15,7 @@ void Server::Run(std::string_view const& port)
 {
 	if (!InitSocket(port))
 	{
-		throw ServerException{ "Failed to initialize socket: " + WSAGetLastError() };
+		throw ServerException{ "Failed to initialize socket: " + std::to_string(WSAGetLastError()) };
 	}
 
 	std::cout << "Pine - version " << std::hex << CurrentVersion << "\nServer Listening" << std::endl;
@@ -40,7 +40,7 @@ void Server::Run(std::string_view const& port)
 		{
 			closesocket(m_socket);
 			WSACleanup();
-			throw ServerException{ "Failed to accept client: " + WSAGetLastError() };
+			throw ServerException{ "Failed to accept client: " + std::to_string(WSAGetLastError()) };
 		}
 
 		auto client = std::make_shared<ServerConnection>(clientSocket, *this);

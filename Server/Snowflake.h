@@ -19,7 +19,9 @@ struct Snowflake
 			Value.sequence = 0;
 	}
 
-	explicit Snowflake(uint64_t const& id)
+	template <typename T>
+		requires std::is_integral_v<T>
+	explicit Snowflake(T const& id)
 	{
 		Value.timestamp = id >> 22;
 		Value.workerId = (id >> 17) & 0x1F;
@@ -35,12 +37,31 @@ struct Snowflake
 		uint64_t sequence : 12;
 	} Value;
 
+	template <typename T>
+		requires std::is_integral_v<T>
+	Snowflake operator =(T const& id)
+	{
+		return Snowflake(id);
+	}
+
+	bool operator !=(Snowflake const& other) const
+	{
+		return !(*this == other);
+	}
+
 	bool operator ==(Snowflake const& other) const
 	{
 		return Value.timestamp == other.Value.timestamp
 			&& Value.workerId == other.Value.workerId
 			&& Value.processId == other.Value.processId
 			&& Value.sequence == other.Value.sequence;
+	}
+
+	template <typename T>
+		requires std::is_integral_v<T>
+	bool operator ==(T const& other) const
+	{
+		return Snowflake(other) == *this;
 	}
 
 	template <typename T>

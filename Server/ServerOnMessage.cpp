@@ -34,11 +34,9 @@ AsyncTask Server::OnMessage(std::shared_ptr<Connection> client, std::shared_ptr<
 		receiveChat->SetAuthorUsername(client->GetUser().GetUsername());
 		receiveChat->SetChatMessage(std::dynamic_pointer_cast<SocketMessages::SendChatMessage>(message)->GetChatMessage());
 
-		co_await client->SendAck();
-
 		for (auto const& iteratedClient : m_clients)
 		{
-			if (iteratedClient->GetId() == client->GetId())
+			if (client->GetId() == iteratedClient.first)
 				continue;
 			co_await client->SendMessage(receiveChat);
 		}

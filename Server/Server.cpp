@@ -21,18 +21,13 @@ void Server::Run(std::string_view const& port)
 	std::cout << "Pine - version " << std::hex << CurrentVersion << "\nServer Listening" << std::endl;
 
 	m_stop = false;
-	bool firstLoop = true;
+
+	DeleteClients();
 
 	while (!m_stop)
 	{
-		if (firstLoop)
-		{
-			firstLoop = false;
-			m_cv.notify_one();
-		}
-
 		SOCKET clientSocket = accept(m_socket, nullptr, nullptr);
-		
+
 		if (m_stop)
 			break;
 
@@ -46,8 +41,8 @@ void Server::Run(std::string_view const& port)
 		auto client = std::make_shared<ServerConnection>(clientSocket, *this);
 		client->Listen();
 
-		std::unique_lock lock{ m_mutateClients };
-		m_clients.push_back(std::move(client));
+		std::unique_lock lock{ m_mutateClientsMutex };
+		m_clients.insert({ client->GetId(), std::move(client) });
 	}
 
 	std::cout << "Socket stops listening" << std::endl;
@@ -61,45 +56,50 @@ void Server::Stop()
 
 	for (auto const& client : m_clients)
 	{
-		if (!client->IsDisconnecting())
-			DisconnectClient(client->GetId());
+		DisconnectClient(client.first);
 	}
-	
+
 	shutdown(m_socket, SD_BOTH);
 	closesocket(m_socket);
 	WSACleanup();
-	m_cv.notify_one();
 }
 
 
 
-AsyncTask Server::DisconnectClient(Snowflake clientId)
+AsyncTask Server::DeleteClients()
 {
-	std::unique_lock lock{ m_mutateClients };
+	co_await SwitchThread(m_deleteClientsThread);
 
-
-	auto client = std::ranges::find_if(m_clients, [clientId](auto const& potentialClient)
-									   {
-										   return potentialClient->GetId() == clientId;
-									   });
-
-	if (client != m_clients.end() && !(*client)->IsDisconnecting())
+	while (!m_stop)
 	{
-		(*client)->SetDisconnecting(true);
-		closesocket((*client)->GetSocket());
-		shutdown((*client)->GetSocket(), SD_BOTH);
+		std::unique_lock lock { m_deleteClientsMutex };
+		m_deleteCliens.wait(lock);
+		m_clientsToDelete.clear();
+	}
+}
 
-		if ((*client)->GetThread().joinable())
-		{
-			(*client)->GetThread().request_stop();
-			(*client)->GetThread().join();
-		}
 
-		m_clients.erase(client);
+
+AsyncTask Server::DisconnectClient(uint64_t clientId)
+{
+	std::unique_lock lock{ m_mutateClientsMutex };
+
+	auto client = m_clients.find(clientId);
+
+	if (client == m_clients.end())
+	{
+		co_return;
 	}
 
-	m_cv.notify_all();
+	closesocket(client->second->GetSocket());
+	shutdown(client->second->GetSocket(), SD_BOTH);
 
+	m_clientsToDelete.push_back(std::move(client->second));
+
+	m_clients.erase(clientId);
+
+	m_deleteCliens.notify_one();
+	
 	co_return;
 }
 

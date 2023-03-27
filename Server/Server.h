@@ -1,7 +1,7 @@
 #pragma once
 
 #include <condition_variable>
-#include <deque>
+#include <unordered_map>
 #include <thread>
 #include <memory>
 #include <mutex>
@@ -22,22 +22,25 @@ public:
 	void Run(std::string_view const& port = "80");
 	void Stop();
 
-	AsyncTask DisconnectClient(Snowflake clientId);
+	AsyncTask DisconnectClient(uint64_t clientId);
 	AsyncTask MessageClient(std::shared_ptr<Connection> const& client, std::shared_ptr<SocketMessages::Message> const& message) const;
 	AsyncTask OnConnect(std::shared_ptr<Connection> const& client) const;
 	AsyncTask OnMessage(std::shared_ptr<Connection> client, std::shared_ptr<SocketMessages::Message> message);
 
-#ifndef MS_CPP_UNITTESTFRAMEWORK
 private:
-#endif
-	std::condition_variable m_cv;
-	std::mutex m_mutateClients;
+	AsyncTask DeleteClients();
+
+	std::condition_variable m_deleteCliens;
+	std::mutex m_deleteClientsMutex;
+	std::mutex m_mutateClientsMutex;
 
 	bool InitSocket(std::string_view const& port);
 
 	std::unordered_map<uint64_t, std::shared_ptr<ServerConnection>> m_clients;
+	std::vector<std::shared_ptr<ServerConnection>> m_clientsToDelete;
 
 	bool m_stop = true;
 	SOCKET m_socket = INVALID_SOCKET;
 	std::jthread m_thread;
+	std::jthread m_deleteClientsThread;
 };

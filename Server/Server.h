@@ -35,7 +35,7 @@ private:
 
 	bool InitSocket(std::string_view const& port);
 
-	std::deque<std::shared_ptr<Connection>> m_clients;
+	std::unordered_map<uint64_t, std::shared_ptr<ServerConnection>> m_clients;
 
 	bool m_stop = true;
 	SOCKET m_socket = INVALID_SOCKET;

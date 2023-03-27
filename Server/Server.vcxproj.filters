@@ -19,12 +19,12 @@
     <Filter Include="Source Files\SocketMessages">
       <UniqueIdentifier>{3fd1da76-1f98-4320-bb32-42a89e3c57aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Connections">
+      <UniqueIdentifier>{84a936c2-ad1d-49ea-b68c-43529ea0bc69}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Server.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Connection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Coroutine.h">
@@ -45,12 +45,18 @@
     <ClCompile Include="Coroutine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Connection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerConnection.cpp">
+      <Filter>Source Files\Connections</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientConnection.cpp">
+      <Filter>Source Files\Connections</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Server.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Connection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Snowflake.h">
@@ -85,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="ErrorMessage.h">
       <Filter>Header Files\SocketMessages</Filter>
+    </ClInclude>
+    <ClInclude Include="Connection.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

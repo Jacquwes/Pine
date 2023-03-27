@@ -43,7 +43,7 @@ void Server::Run(std::string_view const& port)
 			throw ServerException{ "Failed to accept client: " + WSAGetLastError() };
 		}
 
-		auto client = std::make_shared<Connection>(clientSocket, *this);
+		auto client = std::make_shared<ServerConnection>(clientSocket, *this);
 		client->Listen();
 
 		std::unique_lock lock{ m_mutateClients };

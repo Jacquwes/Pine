@@ -10,7 +10,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace ServerIntegrationTests
 {
-	TEST_CLASS(EstablishConnection)
+	TEST_CLASS(EstablishConnectionIntegrationTests)
 	{
 	public:
 

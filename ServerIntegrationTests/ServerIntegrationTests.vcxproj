@@ -160,6 +160,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChatIntegrationsTests.cpp" />
     <ClCompile Include="EstablishConnectionIntegrationTests.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +170,9 @@
     <ProjectReference Include="..\Shared\Shared.vcxproj">
       <Project>{ffa917e0-c449-48c7-bdf3-9877cbd96b46}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EstablishConnection.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

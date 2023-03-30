@@ -38,7 +38,7 @@ AsyncTask Server::OnMessage(std::shared_ptr<Connection> client, std::shared_ptr<
 		{
 			if (client->GetId() == iteratedClient.first)
 				continue;
-			co_await client->SendMessage(receiveChat);
+			co_await std::dynamic_pointer_cast<ServerConnection>(client)->SendMessage(receiveChat);
 		}
 
 		break;

@@ -37,14 +37,14 @@ namespace pine
 	{
 		enum message_type : uint8_t
 		{
-			invalid_message,
-			acknowledge_message,
-			hello_message,
-			identify_message,
-			keep_alive_message,
-			send_chat_message,
-			receive_chat_message,
-			error_message,
+			INVALID_MESSAGE,
+			ACKNOWLEDGE_MESSAGE,
+			HELLO_MESSAGE,
+			IDENTIFY_MESSAGE,
+			KEEP_ALIVE_MESSAGE,
+			SEND_CHAT_MESSAGE,
+			RECEIVE_CHAT_MESSAGE,
+			ERROR_MESSAGE
 		};
 
 		/// <summary>

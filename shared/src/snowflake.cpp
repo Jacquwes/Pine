@@ -51,7 +51,7 @@ namespace pine
 		return static_cast<uint64_t>(*this) == other;
 	}
 
-	snowflake::operator uint64_t() const
+	constexpr snowflake::operator uint64_t() const
 	{
 		return (value.timestamp << 22)
 			| (value.worker_id << 17)

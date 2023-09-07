@@ -42,7 +42,7 @@ namespace pine
 
 		bool operator ==(uint64_t const& other) const;
 
-		explicit(false) constexpr operator uint64_t() const;
+		constexpr operator uint64_t() const;
 
 		/// <summary>
 		/// Writes the snowflake to the output stream.

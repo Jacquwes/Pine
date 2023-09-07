@@ -30,7 +30,7 @@ public:
 private:
 	AsyncTask DeleteClients();
 
-	std::condition_variable m_deleteCliens;
+	std::condition_variable m_deleteClients;
 	std::mutex m_deleteClientsMutex;
 	std::mutex m_mutateClientsMutex;
 

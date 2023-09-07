@@ -73,7 +73,7 @@ AsyncTask Server::DeleteClients()
 	while (!m_stop)
 	{
 		std::unique_lock lock { m_deleteClientsMutex };
-		m_deleteCliens.wait(lock);
+		m_deleteClients.wait(lock);
 		m_clientsToDelete.clear();
 	}
 }
@@ -98,7 +98,7 @@ AsyncTask Server::DisconnectClient(uint64_t clientId)
 
 	m_clients.erase(clientId);
 
-	m_deleteCliens.notify_one();
+	m_deleteClients.notify_one();
 	
 	co_return;
 }

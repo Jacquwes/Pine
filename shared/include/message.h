@@ -74,14 +74,14 @@ namespace pine
 			std::vector<uint8_t> serialize() const;
 
 
-			message_type type_of_message{};
+			message_type type{};
 			uint64_t body_size{};
-			snowflake message_id{};
+			snowflake id{};
 
 			/// <summary>
 			/// The size of the message header in bytes.
 			/// </summary>
-			static uint64_t constexpr size = sizeof(message_type) + sizeof(uint64_t) + sizeof(message_id.value);
+			static uint64_t constexpr size = sizeof(message_type) + sizeof(uint64_t) + sizeof(id.value);
 		};
 
 		/// <summary>

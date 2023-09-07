@@ -4,62 +4,32 @@
 #include <cstdint>
 #include <vector>
 
-#include "Message.h"
+#include "message.h"
 
-namespace SocketMessages
+namespace pine::socket_messages
 {
-	enum class ErrorCode : uint8_t
+	enum class error_code : uint8_t
 	{
-		InvalidMessage,
-		InvalidMessageType,
-		IncompatibleAPIVersion,
-		WrongMessageLength,
-		WrongChatUsernameLength,
-		WrongChatMessageLength,
+		INVALID_MESSAGE,
+		INVALID_MESSAGE_TYPE,
+		INCOMPATIBLE_API_VERSION,
+		WRONG_MESSAGE_LENGTH,
+		WRONG_CHAT_USERNAME_LENGTH,
+		WRONG_CHAT_MESSAGE_LENGTH,
 	};
 
-	struct ErrorMessage : Message
+	struct error_message : message
 	{
-		ErrorMessage()
-		{
-			header.messageType = MessageType::ErrorMessage;
-			header.bodySize = GetBodySize();
-		}
+		error_message();
 
-		explicit ErrorMessage(ErrorCode const& errorCode)
-			: m_errorCode(errorCode)
-		{
-			header.messageType = MessageType::ErrorMessage;
-			header.bodySize = GetBodySize();
-		}
+		explicit error_message(error_code const& error_code);
 
-		bool ParseBody(std::vector<uint8_t> const& buffer) override
-		{
-			if (buffer.size() != GetBodySize())
-				return false;
+		bool parse_body(std::vector<uint8_t> const& buffer) override;
 
-			std::memcpy(std::bit_cast<uint8_t*>(&m_errorCode), &buffer[0], sizeof(m_errorCode));
+		[[nodiscard]] std::vector<uint8_t> serialize() const override;
 
-			return true;
-		}
+		[[nodiscard]] uint64_t get_body_size() const final;
 
-		std::vector<uint8_t> Serialize() const override
-		{
-			std::vector<uint8_t> buffer(MessageHeader::size + GetBodySize(), 0);
-			std::vector<uint8_t> headerBuffer = header.Serialize();
-
-			std::memcpy(&buffer[0], &headerBuffer[0], MessageHeader::size);
-			std::memcpy(&buffer[MessageHeader::size], std::bit_cast<uint8_t*>(&m_errorCode), sizeof(m_errorCode));
-
-			return buffer;
-		}
-
-		uint64_t GetBodySize() const final { return sizeof(m_errorCode); }
-
-		[[nodiscard]] constexpr ErrorCode const& GetErrorCode() const { return m_errorCode; }
-		constexpr void SetErrorCode(ErrorCode const& errorCode) { m_errorCode = errorCode; }
-
-	private:
-		ErrorCode m_errorCode;
+		error_code m_error_code;
 	};
 }

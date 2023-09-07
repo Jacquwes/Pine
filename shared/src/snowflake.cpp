@@ -30,7 +30,9 @@ namespace pine
 
 	snowflake snowflake::operator=(uint64_t const& id)
 	{
-		return snowflake(id);
+		*this = snowflake(id);
+
+		return *this;
 	}
 
 	bool snowflake::operator !=(snowflake const& other) const

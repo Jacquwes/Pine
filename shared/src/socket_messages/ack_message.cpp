@@ -1,22 +1,24 @@
 #include "socket_messages/ack_message.h"
 
 #include <bit>
+#include <cstdint>
 #include <vector>
 
 #include "message.h"
+#include "snowflake.h"
 
 namespace pine::socket_messages
 {
 	acknowledge_message::acknowledge_message()
 	{
-		header.type = message_type::acknowledge_message;
+		header.type = message_type::ACKNOWLEDGE_MESSAGE;
 		header.body_size = get_body_size();
 	}
 
 	acknowledge_message::acknowledge_message(snowflake const& id_)
 		: id{ id_ }
 	{
-		header.type = message_type::acknowledge_message;
+		header.type = message_type::ACKNOWLEDGE_MESSAGE;
 		header.body_size = get_body_size();
 	}
 

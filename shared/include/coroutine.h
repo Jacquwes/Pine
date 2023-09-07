@@ -3,6 +3,7 @@
 #include <coroutine>
 #include <thread>
 #include <stdexcept>
+#include <type_traits>
 
 inline auto SwitchThread(std::jthread& out)
 {

@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <vector>
+
 #include "message.h"
 
 TEST(message_header, default_constructor)

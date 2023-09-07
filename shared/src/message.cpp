@@ -17,10 +17,9 @@ namespace pine::socket_messages
 
 		type = static_cast<message_type>(buffer[0]);
 
-
 		uint64_t new_id = 0;
-		std::memcpy(&id, &buffer[sizeof(type) + sizeof(body_size)], sizeof(new_id));
-		id = snowflake{ new_id };
+		std::memcpy(&new_id, &buffer[sizeof(type) + sizeof(body_size)], sizeof(new_id));
+		id = new_id;
 	}
 
 	std::vector<uint8_t> message_header::serialize() const

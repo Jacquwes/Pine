@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <ostream>
+#include <iosfwd>
 
 namespace pine
 {

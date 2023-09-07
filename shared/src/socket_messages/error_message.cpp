@@ -1,5 +1,11 @@
 #include "socket_messages/error_message.h"
 
+#include <bit>
+#include <cstdint>
+#include <vector>
+
+#include "message.h"
+
 namespace pine::socket_messages
 {
 	error_message::error_message()

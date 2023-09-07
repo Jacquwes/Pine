@@ -55,3 +55,30 @@ TEST(message_header, serialize)
 	EXPECT_EQ(*(uint64_t*)(&buffer[1]), 1);
 	EXPECT_EQ(*(uint64_t*)(&buffer[9]), 1ull);
 }
+
+TEST(message, default_constructor)
+{
+	pine::socket_messages::message msg;
+	EXPECT_EQ(msg.header.type, pine::socket_messages::message_type::invalid_message);
+	EXPECT_EQ(msg.header.body_size, 0);
+	EXPECT_NE(msg.header.id, 0ull);
+}
+
+TEST(message, get_body_size)
+{
+	pine::socket_messages::message msg;
+	EXPECT_EQ(msg.get_body_size(), 0);
+}
+
+TEST(message, parse_body)
+{
+	pine::socket_messages::message msg;
+	EXPECT_FALSE(msg.parse_body({}));
+}
+
+TEST(message, serialize)
+{
+	pine::socket_messages::message msg;
+	auto buffer = msg.serialize();
+	EXPECT_EQ(buffer.size(), pine::socket_messages::message_header::size);
+}

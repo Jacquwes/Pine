@@ -1,5 +1,9 @@
 #include "socket_messages/receive_chat_message.h"
 
+#include <cstdint>
+#include <string_view>
+#include <vector>
+
 namespace pine::socket_messages
 {
 	receive_chat_message::receive_chat_message()

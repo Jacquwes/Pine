@@ -29,6 +29,6 @@ namespace pine::socket_messages
 
 		[[nodiscard]] uint64_t get_body_size() const final;
 
-		error_code m_error_code;
+		error_code error;
 	};
 }

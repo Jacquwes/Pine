@@ -42,8 +42,7 @@ TEST(identify_message, parse_body)
 
 TEST(identify_message, serialize)
 {
-	pine::socket_messages::identify_message msg;
-	msg.username = "test";
+	pine::socket_messages::identify_message msg("test");
 
 	std::vector<uint8_t> buffer = msg.serialize();
 

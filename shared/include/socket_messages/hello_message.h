@@ -1,48 +1,22 @@
 #pragma once
 
-#include <bit>
 #include <cstdint>
 #include <vector>
 
-#include "Message.h"
+#include "message.h"
 
-namespace SocketMessages
+namespace pine::socket_messages
 {
-	struct HelloMessage : Message
+	struct hello_message : message
 	{
-		HelloMessage()
-		{
-			header.messageType = MessageType::HelloMessage;
-			header.bodySize = GetBodySize();
-		}
+		hello_message();
 
-		bool ParseBody(std::vector<uint8_t> const& buffer) override
-		{
-			if (buffer.size() != GetBodySize())
-				return false;
+		bool parse_body(std::vector<uint8_t> const& buffer) override;
 
-			std::memcpy(std::bit_cast<void*>(&m_version), std::bit_cast<void*>(buffer.data()), sizeof(m_version));
+		std::vector<uint8_t> serialize() const override;
 
-			return true;
-		}
+		uint64_t get_body_size() const final;
 
-		std::vector<uint8_t> Serialize() const override
-		{
-			std::vector<uint8_t> buffer(MessageHeader::size + GetBodySize(), 0);
-			std::vector<uint8_t> headerBuffer = header.Serialize();
-
-			std::memcpy(&buffer[0], &headerBuffer[0], MessageHeader::size);
-			std::memcpy(&buffer[MessageHeader::size], &m_version, sizeof(m_version));
-
-			return buffer;
-		}
-
-		uint64_t GetBodySize() const final { return sizeof(m_version); }
-
-		[[nodiscard]] constexpr uint64_t const& GetVersion() const { return m_version; }
-		constexpr void SetVersion(uint64_t const& version) { m_version = version; }
-
-	private:
-		uint64_t m_version{ CurrentVersion };
+		uint64_t m_version{ current_version };
 	};
 }

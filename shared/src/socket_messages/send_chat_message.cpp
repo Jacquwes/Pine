@@ -44,7 +44,7 @@ namespace pine::socket_messages
 		return buffer;
 	}
 
-	size_t send_chat_message::get_body_size() const
+	constexpr uint64_t send_chat_message::get_body_size() const
 	{
 		return sizeof(uint16_t) + message_content.size();
 	}

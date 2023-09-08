@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-inline auto SwitchThread(std::jthread& out)
+inline auto switch_thread(std::jthread& out)
 {
 	struct awaitable
 	{
@@ -25,12 +25,12 @@ inline auto SwitchThread(std::jthread& out)
 
 template <typename T>
 	requires (!std::is_void_v<T>)
-struct AsyncOperation
+struct async_operation
 {
 	struct promise_type
 	{
 		T _value;
-		AsyncOperation<T> get_return_object() noexcept { return AsyncOperation<T>(std::coroutine_handle<promise_type>::from_promise(*this)); }
+		async_operation<T> get_return_object() noexcept { return async_operation<T>(std::coroutine_handle<promise_type>::from_promise(*this)); }
 		std::suspend_never initial_suspend() const noexcept { return {}; }
 		std::suspend_always final_suspend() const noexcept { return {}; }
 		void unhandled_exception() const {}
@@ -43,20 +43,20 @@ struct AsyncOperation
 
 	std::coroutine_handle<promise_type> _coro = nullptr;
 
-	AsyncOperation() = default;
-	explicit AsyncOperation(std::coroutine_handle<promise_type> coro) : _coro(coro) {}
-	AsyncOperation(AsyncOperation const&) = delete;
-	AsyncOperation(AsyncOperation&& other) noexcept
+	async_operation() = default;
+	explicit async_operation(std::coroutine_handle<promise_type> coro) : _coro(coro) {}
+	async_operation(async_operation const&) = delete;
+	async_operation(async_operation&& other) noexcept
 		: _coro(other._coro)
 	{
 		other._coro = nullptr;
 	}
-	~AsyncOperation()
+	~async_operation()
 	{
 		if (_coro.address()) _coro.destroy();
 	}
 
-	AsyncOperation& operator=(AsyncOperation&& other) noexcept
+	async_operation& operator=(async_operation&& other) noexcept
 	{
 		if (&other != this)
 		{
@@ -66,11 +66,11 @@ struct AsyncOperation
 	}
 };
 
-struct AsyncTask
+struct async_task
 {
 	struct promise_type
 	{
-		AsyncTask get_return_object() const noexcept { return {}; }
+		async_task get_return_object() const noexcept { return {}; }
 		std::suspend_never initial_suspend() const noexcept { return {}; }
 		std::suspend_always final_suspend() const noexcept { return {}; }
 		void unhandled_exception() const {}

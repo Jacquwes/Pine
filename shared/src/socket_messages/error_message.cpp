@@ -36,7 +36,7 @@ namespace pine::socket_messages
 		std::vector<uint8_t>::iterator it = buffer.begin();
 
 		it = std::copy_n(header.serialize().begin(), message_header::size, it);
-		it = std::copy_n(&m_error_code, sizeof(m_error_code), it);
+		it = std::copy_n(reinterpret_cast<uint8_t const *>(&m_error_code), sizeof(m_error_code), it);
 
 		return buffer;
 	}

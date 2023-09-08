@@ -1,69 +1,26 @@
 #pragma once
 
-#include <array>
-#include <bit>
 #include <cstdint>
+#include <string>
 #include <vector>
 
-#include "Message.h"
+#include "message.h"
 
-namespace SocketMessages
+namespace pine::socket_messages
 {
-	struct IdentifyMessage : Message
+	struct identify_message : message
 	{
-		IdentifyMessage()
-		{
-			header.messageType = MessageType:: IdentifyMessage;
-			header.bodySize = GetBodySize();
-		}
+		identify_message();
+		identify_message(const std::string& name);
 
-		bool ParseBody(std::vector<uint8_t> const& buffer) override
-		{
-			if (buffer.size() < sizeof(m_usernameLength) + UsernameMinLength
-				|| buffer.size() > sizeof(m_usernameLength) + UsernameMaxLength)
-				return false;
+		bool parse_body(std::vector<uint8_t> const& buffer) override;
 
-			std::memcpy(std::bit_cast<void*>(&m_usernameLength), std::bit_cast<void*>(buffer.data()), sizeof(m_usernameLength));
-			m_username = std::string(buffer.begin() + sizeof(m_usernameLength), buffer.end());
+		std::vector<uint8_t> serialize() const override;
 
-			header.bodySize = GetBodySize();
+		uint64_t get_body_size() const final;
 
-			return true;
-		}
+		constexpr bool check_username(std::string_view const& username);
 
-		std::vector<uint8_t> Serialize() const override
-		{
-			std::vector<uint8_t> buffer(MessageHeader::size + GetBodySize(), 0);
-			std::vector<uint8_t> headerBuffer = header.Serialize();
-
-			std::memcpy(&buffer[0], &headerBuffer[0], MessageHeader::size);
-			std::memcpy(&buffer[MessageHeader::size], &m_usernameLength, sizeof(m_usernameLength));
-			std::memcpy(&buffer[MessageHeader::size + sizeof(m_usernameLength)], &m_username[0], m_usernameLength);
-
-			return buffer;
-		}
-
-		uint64_t GetBodySize() const final
-		{
-			return sizeof(m_usernameLength) + m_usernameLength;
-		}
-
-		[[nodiscard]] constexpr std::string const& GetUsername() const { return m_username; }
-		constexpr bool SetUsername(std::string_view const& username)
-		{
-			if (username.length() < UsernameMinLength || username.length() > UsernameMaxLength)
-				return false;
-
-			m_username = username;
-			m_usernameLength = static_cast<uint8_t>(username.length());
-
-			header.bodySize = GetBodySize();
-
-			return true;
-		}
-
-	private:
-		uint8_t m_usernameLength{};
-		std::string m_username{};
+		std::string username{};
 	};
 }

@@ -15,8 +15,8 @@ namespace pine::socket_messages
 		header.body_size = get_body_size();
 	}
 
-	acknowledge_message::acknowledge_message(snowflake const& id_)
-		: id{ id_ }
+	acknowledge_message::acknowledge_message(snowflake const& id)
+		: acknowledged_message_id{ id }
 	{
 		header.type = message_type::ACKNOWLEDGE_MESSAGE;
 		header.body_size = get_body_size();
@@ -29,7 +29,7 @@ namespace pine::socket_messages
 
 		uint64_t new_id{};
 		std::copy_n(buffer.begin(), sizeof(new_id), reinterpret_cast<uint8_t*>(&new_id));
-		id = snowflake(new_id);
+		acknowledged_message_id = snowflake(new_id);
 
 		return true;
 	}
@@ -40,8 +40,9 @@ namespace pine::socket_messages
 		std::vector<uint8_t>::iterator it = buffer.begin();
 
 		it = std::copy_n(header.serialize().begin(), message_header::size, it);
-		auto id_ = static_cast<uint64_t>(id);
-		it = std::copy_n(&id_, sizeof(id_), it);
+		uint64_t id_ = acknowledged_message_id;
+
+		it = std::copy_n(reinterpret_cast<uint8_t const *>(&id_), sizeof(id_), it);
 
 		return buffer;
 	}

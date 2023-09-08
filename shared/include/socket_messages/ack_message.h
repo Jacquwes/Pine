@@ -20,6 +20,6 @@ namespace pine::socket_messages
 
 		[[nodiscard]] uint64_t get_body_size() const final;
 
-		snowflake id{};
+		snowflake acknowledged_message_id{};
 	};
 }

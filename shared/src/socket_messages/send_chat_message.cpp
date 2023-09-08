@@ -21,6 +21,8 @@ namespace pine::socket_messages
 			return false;
 
 		uint16_t message_length = *reinterpret_cast<uint16_t const*>(buffer.data());
+		if (message_length < chat_message_min_length || message_length > chat_message_max_length)
+			return false;
 		if (buffer.size() != sizeof(uint16_t) + message_length)
 			return false;
 

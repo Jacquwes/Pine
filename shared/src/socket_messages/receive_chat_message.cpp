@@ -1,8 +1,11 @@
 #include "socket_messages/receive_chat_message.h"
 
 #include <cstdint>
+#include <string>
 #include <string_view>
 #include <vector>
+
+#include "message.h"
 
 namespace pine::socket_messages
 {
@@ -60,27 +63,5 @@ namespace pine::socket_messages
 	uint64_t receive_chat_message::get_body_size() const
 	{
 		return sizeof(uint8_t) + author_username.size() + sizeof(uint16_t) + message_content.size();
-	}
-
-	constexpr bool receive_chat_message::check_author_username(std::string_view const& username)
-	{
-		if (username.size() < username_min_length)
-			return false;
-
-		if (username.size() > username_max_length)
-			return false;
-
-		return true;
-	}
-
-	constexpr bool receive_chat_message::check_message_content(std::string_view const& content)
-	{
-		if (content.size() < chat_message_min_length)
-			return false;
-
-		if (content.size() > chat_message_max_length)
-			return false;
-
-		return true;
 	}
 }

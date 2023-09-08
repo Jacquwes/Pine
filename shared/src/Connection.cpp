@@ -5,11 +5,11 @@
 #include <type_traits>
 #include <vector>
 
-#include "Connection.h"
-#include "Coroutine.h"
-#include "Server.h"
-#include "ServerException.h"
-#include "SocketMessages.h"
+#include "connection.h"
+#include "coroutine.h"
+#include "server.h"
+#include "server_exception.h"
+#include "socket_messages.h"
 
 
 

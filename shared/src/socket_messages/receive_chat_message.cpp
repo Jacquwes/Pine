@@ -21,12 +21,16 @@ namespace pine::socket_messages
 			return false;
 
 		uint8_t username_length = buffer[0];
+		if (username_length < username_min_length || username_length > username_max_length)
+			return false;
 		if (buffer.size() < sizeof(uint8_t) + username_length + sizeof(uint16_t) + chat_message_min_length)
 			return false;
 
 		author_username = std::string(buffer.begin() + sizeof(uint8_t), buffer.begin() + sizeof(uint8_t) + username_length);
 
 		uint16_t message_length = *reinterpret_cast<uint16_t const*>(buffer.data() + sizeof(uint8_t) + username_length);
+		if (message_length < chat_message_min_length || message_length > chat_message_max_length)
+			return false;
 		if (buffer.size() != sizeof(uint8_t) + username_length + sizeof(uint16_t) + message_length)
 			return false;
 

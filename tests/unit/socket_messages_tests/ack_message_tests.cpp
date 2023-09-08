@@ -59,3 +59,9 @@ TEST(acknowledge_message, serialize)
 	std::copy_n(buffer.begin() + pine::socket_messages::message_header::size, sizeof(id), reinterpret_cast<uint8_t*>(&id));
 	EXPECT_EQ(id, 0x01);
 }
+
+TEST(acknowledge_message, get_body_size)
+{
+	pine::socket_messages::acknowledge_message msg;
+	EXPECT_EQ(msg.get_body_size(), sizeof(pine::snowflake::value));
+}

@@ -10,4 +10,5 @@ enable_testing()
 find_package(GTest CONFIG REQUIRED)
 
 add_subdirectory(shared)
+add_subdirectory(server)
 add_subdirectory(tests)

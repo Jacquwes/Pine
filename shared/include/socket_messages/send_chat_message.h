@@ -18,7 +18,13 @@ namespace pine::socket_messages
 
 		uint64_t constexpr get_body_size() const final;
 
-		constexpr bool check_message_content(std::string_view const& content);
+		static constexpr bool check_message_content(std::string_view const& content)
+		{
+			if (content.size() < chat_message_min_length || content.size() > chat_message_max_length)
+				return false;
+
+			return true;
+		}
 
 		std::string message_content{};
 	};

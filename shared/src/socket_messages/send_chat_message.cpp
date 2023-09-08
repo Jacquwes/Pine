@@ -48,12 +48,4 @@ namespace pine::socket_messages
 	{
 		return sizeof(uint16_t) + message_content.size();
 	}
-
-	constexpr bool send_chat_message::check_message_content(std::string_view const& content)
-	{
-		if (content.size() < chat_message_min_length || content.size() > chat_message_max_length)
-			return false;
-
-		return true;
-	}
 }

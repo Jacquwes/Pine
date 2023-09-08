@@ -5,10 +5,12 @@
 
 #include <winerror.h>
 #include <WinSock2.h>
-#include <WinUser.h>
 #include <cstdint>
 
 #include "connection.h"
+#include "coroutine.h"
+#include "message.h"
+#include "snowflake.h"
 #include "socket_messages.h"
 
 namespace pine

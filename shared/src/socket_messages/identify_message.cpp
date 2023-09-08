@@ -51,12 +51,4 @@ namespace pine::socket_messages
 	{
 		return sizeof(uint8_t) + username.size();
 	}
-
-	constexpr bool identify_message::check_username(std::string_view const& name) const
-	{
-		if (username.length() < username_min_length || username.length() > username_max_length)
-			return false;
-
-		return true;
-	}
 }

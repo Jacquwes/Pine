@@ -19,7 +19,13 @@ namespace pine::socket_messages
 
 		uint64_t get_body_size() const final;
 
-		constexpr bool check_username(std::string_view const& username) const;
+		static constexpr bool check_username(std::string_view const& name)
+		{
+			if (name.length() < username_min_length || name.length() > username_max_length)
+				return false;
+
+			return true;
+		}
 
 		std::string username{};
 	};

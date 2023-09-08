@@ -27,10 +27,10 @@ namespace pine::socket_messages
 	std::vector<uint8_t> hello_message::serialize() const
 	{
 		std::vector<uint8_t> buffer(message_header::size + get_body_size(), 0);
-		std::vector<uint8_t> headerBuffer = header.serialize();
+		std::vector<uint8_t>::iterator it = buffer.begin();
 
-		std::memcpy(&buffer[0], &headerBuffer[0], message_header::size);
-		std::memcpy(&buffer[message_header::size], &m_version, sizeof(m_version));
+		it = std::copy_n(header.serialize().begin(), message_header::size, it);
+		it = std::copy_n(std::bit_cast<uint8_t const*>(&m_version), sizeof(m_version), it);
 
 		return buffer;
 	}

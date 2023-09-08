@@ -28,7 +28,7 @@ namespace pine::socket_messages
 			return false;
 
 		uint64_t new_id{};
-		std::memcpy(std::bit_cast<void*>(&new_id), std::bit_cast<void*>(buffer.data()), sizeof(new_id));
+		std::copy_n(buffer.begin(), sizeof(new_id), reinterpret_cast<uint8_t*>(&new_id));
 		id = snowflake(new_id);
 
 		return true;
@@ -37,11 +37,11 @@ namespace pine::socket_messages
 	std::vector<uint8_t> acknowledge_message::serialize() const
 	{
 		std::vector<uint8_t> buffer(message_header::size + get_body_size(), 0);
-		std::vector<uint8_t> header_buffer = header.serialize();
+		std::vector<uint8_t>::iterator it = buffer.begin();
 
-		std::memcpy(&buffer[0], &header_buffer[0], message_header::size);
+		it = std::copy_n(header.serialize().begin(), message_header::size, it);
 		auto id_ = static_cast<uint64_t>(id);
-		std::memcpy(&buffer[message_header::size], &id_, sizeof(id_));
+		it = std::copy_n(&id_, sizeof(id_), it);
 
 		return buffer;
 	}

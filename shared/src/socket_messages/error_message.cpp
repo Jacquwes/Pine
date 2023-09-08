@@ -1,6 +1,5 @@
 #include "socket_messages/error_message.h"
 
-#include <bit>
 #include <cstdint>
 #include <vector>
 
@@ -26,7 +25,7 @@ namespace pine::socket_messages
 		if (buffer.size() != get_body_size())
 			return false;
 
-		std::memcpy(std::bit_cast<uint8_t*>(&m_error_code), &buffer[0], sizeof(m_error_code));
+		m_error_code = static_cast<error_code>(buffer[0]);
 
 		return true;
 	}
@@ -34,10 +33,10 @@ namespace pine::socket_messages
 	std::vector<uint8_t> error_message::serialize() const
 	{
 		std::vector<uint8_t> buffer(message_header::size + get_body_size(), 0);
-		std::vector<uint8_t> header_buffer = header.serialize();
+		std::vector<uint8_t>::iterator it = buffer.begin();
 
-		std::memcpy(&buffer[0], &header_buffer[0], message_header::size);
-		std::memcpy(&buffer[message_header::size], std::bit_cast<uint8_t*>(&m_error_code), sizeof(m_error_code));
+		it = std::copy_n(header.serialize().begin(), message_header::size, it);
+		it = std::copy_n(&m_error_code, sizeof(m_error_code), it);
 
 		return buffer;
 	}

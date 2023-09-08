@@ -1,5 +1,11 @@
 #include "socket_messages/identify_message.h"
 
+#include <cstdint>
+#include <string>
+#include <vector>
+
+#include "message.h"
+
 namespace pine::socket_messages
 {
 	identify_message::identify_message()
@@ -31,11 +37,12 @@ namespace pine::socket_messages
 	std::vector<uint8_t> identify_message::serialize() const
 	{
 		std::vector<uint8_t> buffer(message_header::size + get_body_size(), 0);
-		std::vector<uint8_t> header_buffer = header.serialize();
+		std::vector<uint8_t>::iterator it = buffer.begin();
 
-		std::memcpy(&buffer[0], &header_buffer[0], message_header::size);
-		buffer[message_header::size] = username.length();
-		std::memcpy(&buffer[message_header::size + sizeof(uint8_t)], &username[0], username.length());
+		it = std::copy_n(header.serialize().begin(), message_header::size, it);
+		uint8_t username_length = username.size();
+		it = std::copy_n(reinterpret_cast<uint8_t const*>(&username_length), sizeof(uint8_t), it);
+		it = std::copy_n(reinterpret_cast<uint8_t const*>(username.c_str()), username_length, it);
 
 		return buffer;
 	}

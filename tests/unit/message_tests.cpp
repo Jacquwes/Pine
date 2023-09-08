@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "message.h"
-#include "socket_messages.h"
 
 TEST(message_header, default_constructor)
 {

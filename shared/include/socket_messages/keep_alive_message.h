@@ -1,34 +1,20 @@
 #pragma once
 
-#include <bit>
 #include <cstdint>
 #include <vector>
 
-#include "Message.h"
+#include "message.h"
 
-namespace SocketMessages
+namespace pine::socket_messages
 {
-	struct KeepAliveMessage : Message
+	struct keep_alive_message : message
 	{
-		KeepAliveMessage()
-		{
-			header.messageType = MessageType::KeepAliveMessage;
-			header.bodySize = GetBodySize();
-		}
+		keep_alive_message();
 
-		bool ParseBody(std::vector<uint8_t> const& buffer) override
-		{
-			if (buffer.size() != GetBodySize())
-				return false;
+		bool parse_body(std::vector<uint8_t> const& buffer) override;
 
-			return true;
-		}
+		std::vector<uint8_t> serialize() const override;
 
-		std::vector<uint8_t> Serialize() const override
-		{
-			return header.Serialize();
-		}
-
-		uint64_t GetBodySize() const final { return 0; }
+		uint64_t get_body_size() const final;
 	};
 }

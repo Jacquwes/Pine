@@ -3,6 +3,8 @@
 #include <thread>
 #include <string_view>
 
+#include <asio/ip/tcp.hpp>
+
 #include "connection.h"
 #include "coroutine.h"
 #include "snowflake.h"
@@ -13,14 +15,12 @@ namespace pine
 
     class server_connection : public connection
     {
-        friend class connection;
-
     public:
         server_connection(asio::ip::tcp::socket& socket, server& server);
 
         async_task listen();
 
-        async_task send_ack(snowflake id) const;
+        async_task send_ack(snowflake id);
 
     private:
         async_operation<bool> establish_connection();

@@ -16,12 +16,8 @@ namespace pine
 	{
 		std::cout << "Closing connection: " << id << std::endl;
 
-		if (socket != INVALID_SOCKET)
-		{
-			shutdown(socket, SD_BOTH);
-			closesocket(socket);
+        close();
 		}
-	}
 
 
 
@@ -148,4 +144,9 @@ namespace pine
 
 		co_await send_raw_message(buffer);
 	}
+
+    void connection::close()
+    {
+        socket.close();
+    }
 }

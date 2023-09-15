@@ -124,7 +124,6 @@ namespace pine
 
 		default:
 			co_return message;
-			break;
 		}
 
 

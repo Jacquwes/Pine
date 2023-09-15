@@ -24,8 +24,7 @@ namespace pine
 		async_operation<std::vector<uint8_t>> receive_raw_message(uint64_t const& buffer_size);
 		async_task send_raw_message(std::vector<uint8_t> const& buffer);
 
-		async_operation<std::vector<uint8_t>> receive_raw_message(uint64_t const& buffer_size) const;
-		async_task send_raw_message(std::vector<uint8_t> const& buffer) const;
+		void close();
 
 		snowflake id;
 		asio::ip::tcp::socket socket;

@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 enable_testing()
 
+find_package(asio CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
 add_subdirectory(shared)

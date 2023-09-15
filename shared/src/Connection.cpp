@@ -16,48 +16,45 @@ namespace pine
 	{
 		std::cout << "Closing connection: " << id << std::endl;
 
-        close();
-		}
+		close();
+	}
 
 
 
-    async_operation<std::vector<uint8_t>> connection::receive_raw_message(uint64_t const& bufferSize)
+	async_operation<std::vector<uint8_t>> connection::receive_raw_message(uint64_t const& bufferSize)
 	{
 		std::vector<uint8_t> buffer(bufferSize, 0);
 
 		if (!bufferSize)
 			co_return buffer;
 
-		int n = recv(socket, std::bit_cast<char*>(buffer.data()), static_cast<int>(bufferSize), 0);
-		if (n == SOCKET_ERROR)
+		try
 		{
-			int error = WSAGetLastError();
-
-			if (error == WSAECONNRESET || error == WSAECONNABORTED)
-			{
-				co_return buffer;
-			}
-
-			throw "Failed to receive message: " + WSAGetLastError();
+			size_t n = socket.receive(asio::buffer(buffer));
+			buffer.resize(n);
+		}
+		catch (std::exception& e)
+		{
+			std::cout << "Failed to receive message: " << e.what() << std::endl;
+			co_return buffer;
 		}
 
-		buffer.resize(n);
 		co_return buffer;
 	}
 
 
-    async_task connection::send_raw_message(std::vector<uint8_t> const& buffer)
-    {
-        if (buffer.empty())
-            co_return;
-
-        try {
-            socket.send(asio::buffer(buffer));
-        }
-        catch (std::exception const& e)
+	async_task connection::send_raw_message(std::vector<uint8_t> const& buffer)
 	{
-            std::cout << "Failed to send message: " << e.what() << std::endl;
-            co_return;
+		if (buffer.empty())
+			co_return;
+
+		try {
+			socket.send(asio::buffer(buffer));
+		}
+		catch (std::exception const& e)
+		{
+			std::cout << "Failed to send message: " << e.what() << std::endl;
+			co_return;
 		}
 
 		co_return;
@@ -142,15 +139,15 @@ namespace pine
 
 
 
-    async_task connection::send_message(std::shared_ptr<socket_messages::message> const& message)
+	async_task connection::send_message(std::shared_ptr<socket_messages::message> const& message)
 	{
 		std::vector<uint8_t> buffer = message->serialize();
 
 		co_await send_raw_message(buffer);
 	}
 
-    void connection::close()
-    {
-        socket.close();
-    }
+	void connection::close()
+	{
+		socket.close();
+	}
 }

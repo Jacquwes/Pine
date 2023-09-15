@@ -3,14 +3,9 @@
 #include <thread>
 #include <string_view>
 
-#include <WinSock2.h>
-
 #include "connection.h"
 #include "coroutine.h"
 #include "snowflake.h"
-
-#pragma comment(lib, "ws2_32.lib")
-
 
 namespace pine
 {
@@ -21,7 +16,7 @@ namespace pine
         friend class connection;
 
     public:
-        server_connection(SOCKET& socket, server& server);
+        server_connection(asio::ip::tcp::socket& socket, server& server);
 
         async_task listen();
 

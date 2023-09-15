@@ -9,22 +9,19 @@
 #include <unordered_map>
 #include <vector>
 
-#include <WinSock2.h>
+#include <asio.hpp>
 #include <message.h>
 
 #include "connection.h"
 #include "coroutine.h"
 #include "server_connection.h"
 
-#pragma comment(lib, "ws2_32.lib")
-
-
 namespace pine
 {
 	class server
 	{
 	public:
-		void run(std::string_view const& port = "80");
+		server(asio::io_context& io_context, uint16_t const& port = 80);
 		void stop();
 
 		async_task disconnect_client(uint64_t client_id);
@@ -45,8 +42,12 @@ namespace pine
 		std::vector<std::shared_ptr<server_connection>> clients_to_delete;
 
 		bool stop_listening = true;
-		SOCKET socket = INVALID_SOCKET;
+		std::jthread acceptor_thread;
 		std::jthread thread;
 		std::jthread delete_clients_thread;
+
+		asio::io_context& io_context;
+		asio::ip::tcp::acceptor acceptor;
+		asio::error_code error_code;
 	};
 }

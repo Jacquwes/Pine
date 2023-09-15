@@ -3,7 +3,8 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
-#include <WinSock2.h>
+
+#include <asio.hpp>
 
 #include "coroutine.h"
 #include "message.h"
@@ -24,7 +25,7 @@ namespace pine
 		async_task send_raw_message(std::vector<uint8_t> const& buffer) const;
 
 		snowflake id;
-		SOCKET socket{ INVALID_SOCKET };
+		asio::ip::tcp::socket socket;
 		user user_data{};
 	};
 }

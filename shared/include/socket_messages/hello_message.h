@@ -17,6 +17,6 @@ namespace pine::socket_messages
 
 		uint64_t get_body_size() const final;
 
-		uint64_t m_version{ current_version };
+		uint64_t version{ current_version };
 	};
 }

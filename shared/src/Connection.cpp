@@ -12,14 +12,18 @@
 
 namespace pine
 {
+	connection::connection(asio::ip::tcp::socket& socket) :
+		socket(std::move(socket))
+	{
+		std::cout << "New connection: " << id << std::endl;
+	}
+
 	connection::~connection()
 	{
 		std::cout << "Closing connection: " << id << std::endl;
 
 		close();
 	}
-
-
 
 	async_operation<std::vector<uint8_t>> connection::receive_raw_message(uint64_t const& bufferSize)
 	{

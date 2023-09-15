@@ -16,6 +16,7 @@ namespace pine
 	class connection : public std::enable_shared_from_this<connection>
 	{
 	public:
+		connection(asio::ip::tcp::socket& socket);
 		virtual ~connection();
 
 		async_operation<std::shared_ptr<socket_messages::message>> receive_message();
@@ -26,7 +27,7 @@ namespace pine
 
 		void close();
 
-		snowflake id;
+		snowflake id{};
 		asio::ip::tcp::socket socket;
 		user user_data{};
 	};

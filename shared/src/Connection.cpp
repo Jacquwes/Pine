@@ -21,7 +21,7 @@ namespace pine
 
 
 
-	async_operation<std::vector<uint8_t>> connection::receive_raw_message(uint64_t const& bufferSize) const
+    async_operation<std::vector<uint8_t>> connection::receive_raw_message(uint64_t const& bufferSize)
 	{
 		std::vector<uint8_t> buffer(bufferSize, 0);
 
@@ -46,8 +46,9 @@ namespace pine
 	}
 
 
+    async_task connection::send_raw_message(std::vector<uint8_t> const& buffer)
 
-	async_task connection::send_raw_message(std::vector<uint8_t> const& buffer) const
+        try {
 	{
 		int n = send(socket, std::bit_cast<char*>(buffer.data()), static_cast<int>(buffer.size()), 0);
 		if (n == SOCKET_ERROR)
@@ -138,7 +139,7 @@ namespace pine
 
 
 
-	async_task connection::send_message(std::shared_ptr<socket_messages::message> const& message) const
+    async_task connection::send_message(std::shared_ptr<socket_messages::message> const& message)
 	{
 		std::vector<uint8_t> buffer = message->serialize();
 

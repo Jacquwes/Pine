@@ -1,15 +1,12 @@
-#include <bit>
+#include <cstdint>
+#include <exception>
 #include <iostream>
-#include <memory>
 #include <vector>
 
-#include <winerror.h>
-#include <WinSock2.h>
-#include <cstdint>
+#include <asio.hpp>
 
 #include "connection.h"
 #include "coroutine.h"
-#include "message.h"
 #include "snowflake.h"
 #include "socket_messages.h"
 

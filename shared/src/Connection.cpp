@@ -47,13 +47,17 @@ namespace pine
 
 
     async_task connection::send_raw_message(std::vector<uint8_t> const& buffer)
+    {
+        if (buffer.empty())
+            co_return;
 
         try {
+            socket.send(asio::buffer(buffer));
+        }
+        catch (std::exception const& e)
 	{
-		int n = send(socket, std::bit_cast<char*>(buffer.data()), static_cast<int>(buffer.size()), 0);
-		if (n == SOCKET_ERROR)
-		{
-			throw "Failed to send message: " + WSAGetLastError();
+            std::cout << "Failed to send message: " << e.what() << std::endl;
+            co_return;
 		}
 
 		co_return;

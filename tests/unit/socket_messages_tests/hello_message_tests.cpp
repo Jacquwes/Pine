@@ -24,13 +24,13 @@ TEST(hello_message, parse_body)
 	body[0] = 0x01;
 	EXPECT_TRUE(msg.parse_body(body));
 
-	EXPECT_EQ(msg.m_version, 0x01);
+	EXPECT_EQ(msg.version, 0x01);
 }
 
 TEST(hello_message, serialize)
 {
 	pine::socket_messages::hello_message msg;
-	msg.m_version = 0x01;
+	msg.version = 0x01;
 
 	std::vector<uint8_t> buffer = msg.serialize();
 

@@ -19,7 +19,7 @@ namespace pine::socket_messages
 		if (buffer.size() != get_body_size())
 			return false;
 
-		std::memcpy(std::bit_cast<void*>(&m_version), std::bit_cast<void*>(buffer.data()), sizeof(m_version));
+		std::memcpy(std::bit_cast<void*>(&version), std::bit_cast<void*>(buffer.data()), sizeof(version));
 
 		return true;
 	}
@@ -30,13 +30,13 @@ namespace pine::socket_messages
 		std::vector<uint8_t>::iterator it = buffer.begin();
 
 		it = std::copy_n(header.serialize().begin(), message_header::size, it);
-		it = std::copy_n(std::bit_cast<uint8_t const*>(&m_version), sizeof(m_version), it);
+		it = std::copy_n(std::bit_cast<uint8_t const*>(&version), sizeof(version), it);
 
 		return buffer;
 	}
 
 	uint64_t hello_message::get_body_size() const
 	{
-		return sizeof(m_version);
+		return sizeof(version);
 	}
 }

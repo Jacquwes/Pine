@@ -8,108 +8,115 @@
 
 namespace pine
 {
-	/// <summary>
-	/// Minimum length of a chat message. It is used to prevent spam. Equals to 1.
-	/// </summary>
+	/// @brief Minimum length of a chat message.
 	constexpr auto chat_message_min_length = 0x01;
 
-	/// <summary>
-	/// Maximum length of a chat message. It is used to prevent spam. Equals to 2000.
-	/// </summary>
+	/// @brief Maximum length of a chat message.
 	constexpr auto chat_message_max_length = 2000;
 
-	/// <summary>
-	/// Current version of the protocol.
-	/// </summary>
+	/// @brief Current version of the protocol.
 	constexpr auto current_version = 0x2;
 
-	/// <summary>
-	/// Minimum length of a username. Equals to 3.
-	/// </summary>
+	/// @brief Minimum length of a username.
 	constexpr auto username_min_length = 0x03;
 
-	/// <summary>
-	/// Maximum length of a username. Equals to 32.
-	/// </summary>
+	/// @brief Maximum length of a username.
 	constexpr auto username_max_length = 0x20;
 
 	namespace socket_messages
 	{
+		/// @brief Type of a message.
 		enum message_type : uint8_t
 		{
+			/// @brief Invalid message.
+			/// @details This message should never be sent.
 			INVALID_MESSAGE,
+
+			/// @brief Acknowledge message.
+			/// @details This message is sent as a response by the server
+			/// to each message sent by the client.
 			ACKNOWLEDGE_MESSAGE,
+
+			/// @brief Hello message.
+			/// @details This message is sent by the client and the server
+			/// to confirm the connection has been established.
 			HELLO_MESSAGE,
+
+			/// @brief Identify message.
+			/// @details This message is sent by the client to the server
+			/// to identify itself.
 			IDENTIFY_MESSAGE,
+
+			/// @brief Keep alive message.
+			/// @details This message is sent by the client every 5 seconds
+			/// to keep the connection alive.
 			KEEP_ALIVE_MESSAGE,
+
+			/// @brief Send chat message.
+			/// @details This message is sent by the client to the server
+			/// to send a chat message.
 			SEND_CHAT_MESSAGE,
+
+			/// @brief Receive chat message.
+			/// @details This message is sent by the server to the client
+			/// to send a chat message.
 			RECEIVE_CHAT_MESSAGE,
+
+			/// @brief Error message.
+			/// @details This message is sent by the server to the client
+			/// to send an error message.
 			ERROR_MESSAGE
 		};
 
-		/// <summary>
-		/// Represents the header of a message. It contains the type of the message, the size of the body and the id of the message.
-		/// It is located at the beginning of every message.
-		/// </summary>
+		/// @brief Represents a message header.
+		/// @details The header contains the type of the message,
+		/// the size of the body and the id of the message.
+		/// It is meant to be placed at the beginning of a message.
 		struct message_header
 		{
+			/// @brief Constructs an empty and invalid message header.
 			message_header() = default;
 
-			/// <summary>
-			/// Creates a new message header from a buffer. The buffer must contain at least 13 bytes.
-			/// The first byte is the type of the message, the next 8 bytes are the size of the body and the last 8 bytes are the id of the message.
-			/// </summary>
-			/// <param name="buffer"></param>
+			/// @brief Constructs a message header from a buffer.
 			explicit message_header(std::vector<uint8_t> const& buffer);
 
-			/// <summary>
-			/// Loads a message from a buffer. The buffer must contain at least 13 bytes.
-			/// The first byte is the type of the message, the next 8 bytes are the size of the body and the last 8 bytes are the id of the message.
-			/// </summary>
+			/// @brief Load the message header from a buffer.
 			void parse(std::vector<uint8_t> const& buffer);
 
-			/// <summary>
-			/// Serializes the message header to a buffer.
-			/// </summary>
+			/// @brief Serialize the message header to a buffer.
 			std::vector<uint8_t> serialize() const;
 
-
+			/// @brief Type of the message.
 			message_type type{};
+
+			/// @brief Size of the body of the message.
 			uint64_t body_size{};
+
+			/// @brief Id of the message.
 			snowflake id{};
 
-			/// <summary>
-			/// The size of the message header in bytes.
-			/// </summary>
+			/// @brief Size of the message header.
 			static uint64_t constexpr size = sizeof(message_type) + sizeof(uint64_t) + sizeof(id.value);
 		};
 
-		/// <summary>
-		/// Represents a message. It contains a header and a body.
-		/// </summary>
+		/// @brief Represents a message.
+		/// @details A message is composed of a header and a body.
 		struct message : std::enable_shared_from_this<message>
 		{
+			/// @brief Default destructor.
 			virtual ~message() = default;
 
-			/// <summary>
-			/// Returns the number of bytes of the body.
-			/// </summary>
+			/// @brief Size of the body. 
 			virtual uint64_t get_body_size() const;
 
-			/// <summary>
-			/// Loads the body of the message from a buffer.
-			/// </summary>
-			/// <returns>True if the body was loaded successfully, false otherwise.</returns>
+			/// @brief Load the body of the message from a buffer.
+			/// @return `true` if the body was successfully loaded, `false` otherwise.
 			virtual bool parse_body(std::vector<uint8_t> const& buffer);
 
-			/// <summary>
-			/// Serializes the body of the message to a buffer.
-			/// </summary>
+			/// @brief Serialize the message to a buffer.
 			virtual std::vector<uint8_t> serialize() const;
 
-			/// <summary>
-			/// Returns the header of the message.
-			/// </summary>
+			/// @brief Header of the message.
 			message_header header{};
 		};
 	}

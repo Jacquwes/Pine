@@ -5,6 +5,9 @@
 #include <stdexcept>
 #include <type_traits>
 
+/// @brief Continue execution on a different thread.
+/// @param out The thread to continue execution on.
+/// @return A coroutine awaitable.
 inline auto switch_thread(std::jthread& out)
 {
 	struct awaitable
@@ -23,6 +26,9 @@ inline auto switch_thread(std::jthread& out)
 	return awaitable{ &out };
 }
 
+/// @brief An awaitable coroutine that returns a value.
+/// @tparam T The type of the value to return.
+/// @details For more information see: https://en.cppreference.com/w/cpp/language/coroutines
 template <typename T>
 	requires (!std::is_void_v<T>)
 struct async_operation
@@ -39,33 +45,34 @@ struct async_operation
 
 	bool await_ready() const { return false; }
 	void await_suspend(std::coroutine_handle<> h) const { h.resume(); }
-	auto await_resume() { return _coro.promise()._value; }
+	auto await_resume() { return _coroutine.promise()._value; }
 
-	std::coroutine_handle<promise_type> _coro = nullptr;
+	std::coroutine_handle<promise_type> _coroutine = nullptr;
 
 	async_operation() = default;
-	explicit async_operation(std::coroutine_handle<promise_type> coro) : _coro(coro) {}
+	explicit async_operation(std::coroutine_handle<promise_type> coroutine) : _coroutine(coroutine) {}
 	async_operation(async_operation const&) = delete;
 	async_operation(async_operation&& other) noexcept
-		: _coro(other._coro)
+		: _coroutine(other._coroutine)
 	{
-		other._coro = nullptr;
+		other._coroutine = nullptr;
 	}
 	~async_operation()
 	{
-		if (_coro.address()) _coro.destroy();
+		if (_coroutine.address()) _coroutine.destroy();
 	}
 
 	async_operation& operator=(async_operation&& other) noexcept
 	{
 		if (&other != this)
 		{
-			_coro = other._coro;
-			other._coro = nullptr;
+			_coroutine = other._coroutine;
+			other._coroutine = nullptr;
 		}
 	}
 };
 
+/// @brief An awaitable coroutine that returns nothing.
 struct async_task
 {
 	struct promise_type

@@ -1,0 +1,17 @@
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - docs
+
+name: Build doxygen documentation
+jobs:
+  build-documentation:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Doxygen
+      run: sudo apt install doxygen
+    - name: Install dot
+      run: sudo apt install graphviz
+    - name: Run doxygen
+      run: doxygen ./doxyfile

@@ -1,6 +1,4 @@
-# API specifications
-
-# Version 2
+# API specifications - version 2
 
 ## Content table
 

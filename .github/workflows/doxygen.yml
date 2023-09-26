@@ -9,9 +9,9 @@ jobs:
   build-documentation:
     runs-on: ubuntu-latest
     steps:
-    - name: Install Doxygen
-      run: sudo apt install doxygen
-    - name: Install dot
-      run: sudo apt install graphviz
+    - name: Inspect current file structure
+      run: ls
+    - name: Install Doxygen and Dot
+      run: sudo apt install doxygen graphviz
     - name: Run doxygen
       run: doxygen ./doxyfile

@@ -22,6 +22,8 @@ namespace pine
 	void server::listen()
 	{
 		is_listening = true;
+
+		if (!acceptor.is_open())
 		acceptor.open(asio::ip::tcp::v4(), error_code);
 
 		if (error_code)

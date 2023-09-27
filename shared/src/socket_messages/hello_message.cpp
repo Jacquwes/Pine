@@ -20,7 +20,7 @@ namespace pine::socket_messages
 		if (buffer.size() != get_body_size())
 			return false;
 
-		std::memcpy(std::bit_cast<void*>(&version), std::bit_cast<void*>(buffer.data()), sizeof(version));
+		std::copy_n(buffer.begin(), sizeof(version), std::bit_cast<uint8_t*>(&version));
 
 		return true;
 	}

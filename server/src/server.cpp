@@ -1,16 +1,12 @@
 #include <cstdint>
 #include <iostream>
-#include <memory>
-#include <string>
 #include <string_view>
-#include <type_traits>
+#include <string>
 
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
-#include <coroutine.h>
 
 #include "server.h"
-#include "server_connection.h"
 
 namespace pine
 {
@@ -21,8 +17,6 @@ namespace pine
 
 	void server::listen()
 	{
-		delete_disconnected_clients();
-
 		is_listening = true;
 		acceptor.open(asio::ip::tcp::v4(), error_code);
 
@@ -90,18 +84,6 @@ namespace pine
 		}
 
 		co_return;
-	}
-
-	async_task server::delete_disconnected_clients()
-	{
-		co_await switch_thread(delete_clients_thread);
-
-		while (!is_listening)
-		{
-			std::unique_lock lock{ delete_clients_mutex };
-			delete_clients_cv.wait(lock);
-			disconnected_clients.clear();
-		}
 	}
 
 	async_task server::disconnect_client(uint64_t const& client_id)

@@ -35,11 +35,6 @@ namespace pine
 		/// @brief Stop listening for connections.
 		void stop();
 
-		/// @brief Disconnect a client.
-		/// @param client_id Id of the client to disconnect.	
-		/// @return An asynchronous task completed when the client has been disconnected.
-		async_task disconnect_client(uint64_t const& client_id);
-
 		/// @brief Send a message to a client.
 		/// @param client Client to send the message to.
 		/// @param message Message to send.

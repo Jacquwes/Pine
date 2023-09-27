@@ -58,12 +58,10 @@ namespace pine
 		/// @return An asynchronous task completed when the server has stopped listening.
 		async_task accept_clients();
 
-		std::condition_variable delete_clients_cv;
 		std::mutex delete_clients_mutex;
 		std::mutex mutate_clients_mutex;
 
 		std::unordered_map<uint64_t, std::shared_ptr<server_connection>> clients;
-		std::vector<std::shared_ptr<server_connection>> disconnected_clients;
 
 		bool is_listening = false;
 		std::jthread acceptor_thread;

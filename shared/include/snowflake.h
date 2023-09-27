@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <iosfwd>
+#include <iostream>
 
 namespace pine
 {
@@ -47,10 +47,20 @@ namespace pine
 		/// @brief Compare a snowflake with an id.
 		bool operator ==(uint64_t const& other) const;
 
-		constexpr operator uint64_t() const;
+		/// @brief Convert the snowflake to an id.
+		constexpr operator uint64_t() const
+		{
+			return (value.timestamp << 22)
+				| (value.worker_id << 17)
+				| (value.process_id << 12)
+				| value.sequence;
+		}
 
 		/// @brief Write the snowflake to the given output stream.
-		friend std::ostream& operator<<(std::ostream& out, snowflake const& snowflake);
+		friend std::ostream& operator << (std::ostream& out, pine::snowflake const& snowflake)
+		{
+			return out << static_cast<uint64_t>(snowflake);
+		}
 
 	private:
 		/// @brief The last millisecond a snowflake was generated.

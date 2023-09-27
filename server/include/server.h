@@ -35,6 +35,11 @@ namespace pine
 		/// @brief Stop listening for connections.
 		void stop();
 
+		/// @brief Disconnect a client.
+		/// @param client_id Id of the client to disconnect.	
+		/// @return An asynchronous task completed when the client has been disconnected.
+		async_task disconnect_client(uint64_t const& client_id);
+
 		/// @brief Send a message to a client.
 		/// @param client Client to send the message to.
 		/// @param message Message to send.
@@ -52,11 +57,6 @@ namespace pine
 		/// This function waits for clients to connect and creates a server connection for each client.
 		/// @return An asynchronous task completed when the server has stopped listening.
 		async_task accept_clients();
-
-		/// @brief Delete disconnected clients.
-		/// This function deletes disconnected clients from the server.
-		/// @return An asynchronous task completed when the server has stopped listening.
-		async_task delete_disconnected_clients();
 
 		std::condition_variable delete_clients_cv;
 		std::mutex delete_clients_mutex;

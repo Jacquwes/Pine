@@ -51,23 +51,25 @@ jobs:
       # Install vcpkg to a known location
       run: git clone https://github.com/microsoft/vcpkg.git ${{ github.workspace }}/vcpkg
 
-    - name: Bootstrap vcpkg
+    - name: Bootstrap vcpkg linux
       # Bootstrap vcpkg using the appropriate triplet for the current runner operating system
-      run: |
-            if [ "$RUNNER_OS" == "Linux" ]; then
-                ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh -disableMetrics
-            elif [ "$RUNNER_OS" == "Windows" ]; then
-                ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat -disableMetrics
-            fi
+      if: matrix.os == 'ubuntu-latest'
+      run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh -disableMetrics
+
+    - name: Bootstrap vcpkg windows
+      # Bootstrap vcpkg using the appropriate triplet for the current runner operating system
+      if: matrix.os == 'windows-latest'
+      run: ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat -disableMetrics
   
-    - name: Install asio and gtest
+    - name: Install asio and gtest linux
       # Install dependencies using the appropriate triplet for the current runner operating system
-      run: |
-            if [ "$RUNNER_OS" == "Linux" ]; then
-                ${{ github.workspace }}/vcpkg/vcpkg install asio:x64-linux gtest:x64-linux
-            elif [ "$RUNNER_OS" == "Windows" ]; then
-                ${{ github.workspace }}/vcpkg/vcpkg install asio:x64-windows gtest:x64-windows
-            fi
+      run: ${{ github.workspace }}/vcpkg/vcpkg install asio:x64-linux gtest:x64-linux
+      if: matrix.os == 'ubuntu-latest'
+
+    - name: Install asio and gtest windows
+  # Install dependencies using the appropriate triplet for the current runner operating system
+      run: ${{ github.workspace }}/vcpkg/vcpkg install asio:x64-windows gtest:x64-windows
+      if: matrix.os == 'windows-latest'
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.

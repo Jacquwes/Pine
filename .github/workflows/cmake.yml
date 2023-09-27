@@ -54,18 +54,18 @@ jobs:
     - name: Bootstrap vcpkg
       # Bootstrap vcpkg using the appropriate triplet for the current runner operating system
       run: |
-            if [ ${{ matrix.os }} == "ubuntu-latest" ]; then
+            if [ "$RUNNER_OS" == "Linux" ]; then
                 ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh -disableMetrics
-            else
+            elif [ "$RUNNER_OS" == "Windows" ]; then
                 ${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat -disableMetrics
             fi
   
     - name: Install asio and gtest
       # Install dependencies using the appropriate triplet for the current runner operating system
       run: |
-            if [ ${{ matrix.os }} == "ubuntu-latest" ]; then
+            if [ "$RUNNER_OS" == "Linux" ]; then
                 ${{ github.workspace }}/vcpkg/vcpkg install asio:x64-linux gtest:x64-linux
-            else
+            elif [ "$RUNNER_OS" == "Windows" ]; then
                 ${{ github.workspace }}/vcpkg/vcpkg install asio:x64-windows gtest:x64-windows
             fi
 

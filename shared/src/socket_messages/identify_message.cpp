@@ -1,5 +1,6 @@
 #include "socket_messages/identify_message.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <string>
 #include <vector>

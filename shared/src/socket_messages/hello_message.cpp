@@ -1,5 +1,6 @@
 #include "socket_messages/hello_message.h"
 
+#include <algorithm>
 #include <bit>
 #include <cstdint>
 #include <vector>

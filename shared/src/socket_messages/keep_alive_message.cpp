@@ -1,5 +1,6 @@
 #include "socket_messages/keep_alive_message.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <vector>
 

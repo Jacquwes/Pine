@@ -65,6 +65,8 @@ namespace pine
 
 	async_task server::accept_clients()
 	{
+		std::cout << "Socket starts listening" << std::endl;
+
 		while (is_listening)
 		{
 			asio::ip::tcp::socket client_socket{ io_context };
@@ -73,7 +75,8 @@ namespace pine
 
 			if (error_code)
 			{
-				std::cout << "Failed to accept client: " << error_code.message() << std::endl;
+				std::cout << "Failed to accept client: " << error_code.message() <<
+					std::endl;
 				continue;
 			}
 
@@ -88,6 +91,8 @@ namespace pine
 				clients.insert({ client->id, std::move(client) });
 			}
 		}
+
+		std::cout << "Socket stops listening" << std::endl;
 
 		co_return;
 	}
@@ -114,7 +119,10 @@ namespace pine
 		co_return;
 	}
 
-	async_task server::message_client(std::shared_ptr<connection> const& client, std::shared_ptr<socket_messages::message> const& message) const
+	async_task server::message_client(
+		std::shared_ptr<connection> const& client,
+		std::shared_ptr<socket_messages::message> const& message
+	) const
 	{
 		co_await client->send_message(message);
 	}

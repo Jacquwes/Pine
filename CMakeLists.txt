@@ -10,7 +10,9 @@ enable_testing()
 find_package(asio CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
-add_definitions(-D_WIN32_WINNT=0x0A00)
+if (WIN32)
+	add_definitions(-D_WIN32_WINNT=0x0A00)
+endif()
 
 add_subdirectory(shared)
 add_subdirectory(server)

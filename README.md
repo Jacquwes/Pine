@@ -1,5 +1,7 @@
 # Pine
 
+[![CMake on multiple platforms](https://github.com/Jacquwes/Pine/actions/workflows/cmake.yml/badge.svg?branch=asio)](https://github.com/Jacquwes/Pine/actions/workflows/cmake.yml)
+
 Pine is a modern and lightweight C++20 library for building chat applications.
 
 It uses its own protocol, which is based on TCP using asio. Therefore, it is 

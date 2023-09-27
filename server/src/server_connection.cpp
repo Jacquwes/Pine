@@ -18,7 +18,10 @@
 
 namespace pine
 {
-	server_connection::server_connection(asio::ip::tcp::socket& client_socket, server& server)
+	server_connection::server_connection(
+		asio::ip::tcp::socket& client_socket,
+		server& server
+	)
 		: server_ref{ server },
 		connection{ client_socket }
 	{
@@ -30,29 +33,30 @@ namespace pine
 	{
 		co_await switch_thread(listen_thread);
 
+		std::scoped_lock lock(connection_mutex);
+
 		if (!(co_await establish_connection()))
 		{
-			server_ref.disconnect_client(id);
+			close();
 			co_return;
 		}
 
 		std::cout << "  Client successfully connected: " << std::dec << id << std::endl;
+		is_connected = true;
 
-		while (true)
+		while (is_connected)
 		{
 			auto&& message = co_await receive_message();
 
 			if (message->header.type == socket_messages::message_type::INVALID_MESSAGE)
 			{
-				server_ref.disconnect_client(id);
+				close();
 				co_return;
 			}
 
 			server_ref.on_message(shared_from_this(), message);
 		}
 	}
-
-
 
 	async_operation<bool> server_connection::establish_connection()
 	{
@@ -78,12 +82,11 @@ namespace pine
 			co_return false;
 		}
 
-		std::cout << "  Client successfully identified in as \"" << user_data.username << "\": " << std::dec << id << std::endl;
+		std::cout << "  Client successfully identified in as \"" << user_data.username
+			<< "\": " << std::dec << id << std::endl;
 
 		co_return true;
 	}
-
-
 
 	async_operation<bool> server_connection::validate_connection()
 	{
@@ -92,10 +95,15 @@ namespace pine
 		std::uniform_int_distribution<uint64_t> distribution(0, -1);
 		uint64_t key = distribution(engine);
 
-		std::vector<uint8_t> keyBuffer(std::bit_cast<uint8_t*>(&key), std::bit_cast<uint8_t*>(&key) + sizeof(uint64_t));
+		std::vector<uint8_t> keyBuffer(
+			std::bit_cast<uint8_t*>(&key),
+			std::bit_cast<uint8_t*>(&key) + sizeof(uint64_t)
+		);
 
-		std::cout << "  Sending key " << std::hex << key << " to client " << std::dec << id << std::endl;
-		std::cout << "  Client should answer " << std::hex << (key ^ 0xF007CAFEC0C0CACA) << std::endl;
+		std::cout << "  Sending key " << std::hex << key << " to client " << std::dec
+			<< id << "\n";
+		std::cout << "  Client should answer " << std::hex << (key ^ 0xF007CAFEC0C0CACA)
+			<< std::endl;
 		co_await send_raw_message(keyBuffer);
 
 		auto&& response = co_await receive_raw_message(sizeof(uint64_t));
@@ -103,14 +111,15 @@ namespace pine
 			co_return false;
 
 		key ^= 0xF007CAFEC0C0CACA;
-		keyBuffer.assign(std::bit_cast<uint8_t*>(&key), std::bit_cast<uint8_t*>(&key) + sizeof(uint64_t));
+		keyBuffer.assign(
+			std::bit_cast<uint8_t*>(&key),
+			std::bit_cast<uint8_t*>(&key) + sizeof(uint64_t)
+		);
 
 		if (std::ranges::equal(keyBuffer, response))
 			co_return true;
 		co_return false;
 	}
-
-
 
 	async_operation<bool> server_connection::check_version()
 	{
@@ -120,14 +129,13 @@ namespace pine
 		if (hello->header.type != socket_messages::message_type::HELLO_MESSAGE)
 			co_return false;
 
-		auto version = std::dynamic_pointer_cast<socket_messages::hello_message>(hello)->version;
+		auto version =
+			std::dynamic_pointer_cast<socket_messages::hello_message>(hello)->version;
 		if (version != current_version)
 			co_return false;
 
 		co_return true;
 	}
-
-
 
 	async_operation<bool> server_connection::identify()
 	{
@@ -136,18 +144,36 @@ namespace pine
 		if (message->header.type != socket_messages::message_type::IDENTIFY_MESSAGE)
 			co_return false;
 
-		auto&& identifyMessage = std::dynamic_pointer_cast<socket_messages::identify_message>(message);
+		auto&& identifyMessage =
+			std::dynamic_pointer_cast<socket_messages::identify_message>(message);
 
 		user_data.username = identifyMessage->username;
 
 		co_return true;
 	}
 
-
-
 	async_task server_connection::send_ack(snowflake id)
 	{
 		auto message = std::make_shared<socket_messages::acknowledge_message>(id);
 		co_await send_message(message);
+	}
+
+	async_task server_connection::close()
+	{
+		// Return to the server thread if we're not already on it.
+		if (std::this_thread::get_id() == listen_thread.get_id())
+			co_await switch_thread(listen_thread);
+
+		std::scoped_lock lock(connection_mutex);
+
+		std::cout << "  Closing connection: " << std::dec << id << std::endl;
+
+		this->socket.close();
+
+		server_ref.disconnect_client(id);
+
+		std::cout << "  Connection closed: " << std::dec << id << std::endl;
+
+		co_return;
 	}
 }

@@ -24,7 +24,7 @@ namespace pine
 		is_listening = true;
 
 		if (!acceptor.is_open())
-		acceptor.open(asio::ip::tcp::v4(), error_code);
+			acceptor.open(asio::ip::tcp::v4(), error_code);
 
 		if (error_code)
 		{
@@ -108,13 +108,7 @@ namespace pine
 			co_return;
 		}
 
-		client->second->close();
-
-		disconnected_clients.push_back(std::move(client->second));
-
 		clients.erase(client_id);
-
-		delete_clients_cv.notify_one();
 
 		co_return;
 	}

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <thread>
+#include <mutex>
 #include <string_view>
+#include <thread>
 
 #include <asio/ip/tcp.hpp>
 
@@ -29,6 +30,13 @@ namespace pine
         /// @return An asynchronous task completed when the message has been sent.
         async_task send_ack(snowflake id);
 
+        /// @brief Close the connection and remove it from the server.
+        /// @return An asynchronous task completed when the connection has been closed.
+        async_task close();
+
+        /// @brief Mutex to protect the connection.
+        std::mutex connection_mutex;
+
     private:
         /// @brief Establish a connection with the client.
         /// @return An asynchronous operation that returns true if the connection has been established.
@@ -46,7 +54,13 @@ namespace pine
         /// @return An asynchronous operation that returns true if the client has been identified.
         async_operation<bool> identify();
 
+        /// @brief The server this connection belongs to.
         server& server_ref;
+
+        /// @brief The thread this connection is listening on.
         std::jthread listen_thread;
+
+        /// @brief Whether the connection is connected.
+        bool is_connected = true;
     };
 }

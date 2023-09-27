@@ -48,7 +48,7 @@ namespace pine::socket_messages
 		return buffer;
 	}
 
-	size_t identify_message::get_body_size() const
+	uint64_t identify_message::get_body_size() const
 	{
 		return sizeof(uint8_t) + username.size();
 	}

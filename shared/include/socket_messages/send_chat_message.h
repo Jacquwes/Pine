@@ -23,7 +23,7 @@ namespace pine::socket_messages
 
 		/// @brief Get the size of the body of the send chat message.
 		[[nodiscard]]
-		uint64_t constexpr get_body_size() const final;
+		uint64_t get_body_size() const final;
 
 		/// @brief Check if the given message content is valid.
 		/// @param content Message content to check.

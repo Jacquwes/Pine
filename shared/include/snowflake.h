@@ -45,6 +45,9 @@ namespace pine
 		bool operator ==(snowflake const& other) const;
 
 		/// @brief Compare a snowflake with an id.
+		bool operator !=(uint64_t const& other) const;
+
+		/// @brief Compare a snowflake with an id.
 		bool operator ==(uint64_t const& other) const;
 
 		/// @brief Convert the snowflake to an id.

@@ -48,6 +48,11 @@ namespace pine
 			&& value.sequence == other.value.sequence;
 	}
 
+	bool snowflake::operator !=(uint64_t const& other) const
+	{
+		return !(*this == other);
+	}
+
 	bool snowflake::operator ==(uint64_t const& other) const
 	{
 		return static_cast<uint64_t>(*this) == other;

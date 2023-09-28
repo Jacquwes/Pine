@@ -14,11 +14,11 @@
 namespace pine
 {
 	/// @brief A connection base class that is used by the server and the client.
-	class connection : public std::enable_shared_from_this<connection>
+	class connection
 	{
 	public:
 		/// @brief Construct a connection with the given socket.
-		connection(asio::ip::tcp::socket& socket);
+		connection(asio::ip::tcp::socket socket);
 
 		/// @brief Destroy the connection.
 		virtual ~connection();

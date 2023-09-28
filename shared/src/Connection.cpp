@@ -12,7 +12,7 @@
 
 namespace pine
 {
-	connection::connection(asio::ip::tcp::socket& socket) :
+	connection::connection(asio::ip::tcp::socket socket) :
 		socket(std::move(socket))
 	{
 		std::cout << "New connection: " << id << std::endl;

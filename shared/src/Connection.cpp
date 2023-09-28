@@ -15,12 +15,12 @@ namespace pine
 	connection::connection(asio::ip::tcp::socket socket) :
 		socket(std::move(socket))
 	{
-		std::cout << "New connection: " << id << std::endl;
+		std::cout << "[Connection] New connection: " << id << std::endl;
 	}
 
 	connection::~connection()
 	{
-		std::cout << "Closing connection: " << id << std::endl;
+		std::cout << "[Connection] Closing connection: " << id << std::endl;
 
 		close();
 	}
@@ -38,7 +38,7 @@ namespace pine
 
 		if (ec && ec != asio::error::connection_reset)
 		{
-			std::cout << "Failed to receive message: " << std::dec << ec.value() << " -> " << ec.message() << std::endl;
+			std::cout << "[Connection] Failed to receive message: " << std::dec << ec.value() << " -> " << ec.message() << std::endl;
 			co_return buffer;
 		}
 
@@ -58,7 +58,7 @@ namespace pine
 		}
 		catch (std::exception const& e)
 		{
-			std::cout << "Failed to send message: " << e.what() << std::endl;
+			std::cout << "[Connection] Failed to send message: " << e.what() << std::endl;
 			co_return;
 		}
 

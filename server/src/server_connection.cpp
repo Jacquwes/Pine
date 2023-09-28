@@ -26,7 +26,7 @@ namespace pine
 		connection{ std::move(client_socket) }
 	{
 
-		std::cout << "New client connection opened: " << std::dec << id << std::endl;
+		std::cout << "[Server] New client connection opened: " << std::dec << id << std::endl;
 	}
 
 	async_task server_connection::listen()
@@ -44,7 +44,7 @@ namespace pine
 			co_return;
 		}
 
-		std::cout << "  Client successfully connected: " << std::dec << id << std::endl;
+		std::cout << "[Server]   Client successfully connected: " << std::dec << id << std::endl;
 		is_connected = true;
 
 		for (auto& callback : server_ref.on_connection_callbacks)
@@ -68,27 +68,27 @@ namespace pine
 	{
 		if (!(co_await validate_connection()))
 		{
-			std::cout << "  Client failed validation: " << std::dec << id << std::endl;
+			std::cout << "[Server]   Client failed validation: " << std::dec << id << std::endl;
 			co_return false;
 		}
 
-		std::cout << "  Client passed validation: " << std::dec << id << std::endl;
+		std::cout << "[Server]   Client passed validation: " << std::dec << id << std::endl;
 
 		if (!(co_await check_version()))
 		{
-			std::cout << "  Client failed version check: " << std::dec << id << std::endl;
+			std::cout << "[Server]   Client failed version check: " << std::dec << id << std::endl;
 			co_return false;
 		}
 
-		std::cout << "  Client passed version check: " << std::dec << id << std::endl;
+		std::cout << "[Server]   Client passed version check: " << std::dec << id << std::endl;
 
 		if (!(co_await identify()))
 		{
-			std::cout << "  Client failed identify: " << std::dec << id << std::endl;
+			std::cout << "[Server]   Client failed identify: " << std::dec << id << std::endl;
 			co_return false;
 		}
 
-		std::cout << "  Client successfully identified in as \"" << user_data.username
+		std::cout << "[Server]   Client successfully identified in as \"" << user_data.username
 			<< "\": " << std::dec << id << std::endl;
 
 		co_return true;
@@ -106,9 +106,9 @@ namespace pine
 			std::bit_cast<uint8_t*>(&key) + sizeof(uint64_t)
 		);
 
-		std::cout << "  Sending key " << std::hex << key << " to client " << std::dec
+		std::cout << "[Server]   Sending key " << std::hex << key << " to client " << std::dec
 			<< id << "\n";
-		std::cout << "  Client should answer " << std::hex << (key ^ 0xF007CAFEC0C0CACA)
+		std::cout << "[Server]   Client should answer " << std::hex << (key ^ 0xF007CAFEC0C0CACA)
 			<< std::endl;
 		co_await send_raw_message(keyBuffer);
 
@@ -172,13 +172,13 @@ namespace pine
 
 		std::scoped_lock lock(connection_mutex);
 
-		std::cout << "  Closing connection: " << std::dec << id << std::endl;
+		std::cout << "[Server]   Closing connection: " << std::dec << id << std::endl;
 
 		this->socket.close();
 
 		server_ref.disconnect_client(id);
 
-		std::cout << "  Connection closed: " << std::dec << id << std::endl;
+		std::cout << "[Server]   Connection closed: " << std::dec << id << std::endl;
 
 		co_return;
 	}

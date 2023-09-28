@@ -28,13 +28,13 @@ namespace pine
 
 		if (error_code)
 		{
-			std::cout << "Failed to open acceptor: " << error_code.message() << std::endl;
+			std::cout << "[Server] Failed to open acceptor: " << error_code.message() << std::endl;
 			return;
 		}
 
 		accept_clients();
 
-		std::cout << "Socket stops listening" << std::endl;
+		std::cout << "[Server] Socket stops listening" << std::endl;
 	}
 
 	void server::stop()
@@ -45,14 +45,14 @@ namespace pine
 
 		if (error_code)
 		{
-			std::cout << "Failed to cancel acceptor: " << error_code.message() << std::endl;
+			std::cout << "[Server] Failed to cancel acceptor: " << error_code.message() << std::endl;
 		}
 
 		acceptor.close(error_code);
 
 		if (error_code)
 		{
-			std::cout << "Failed to close acceptor: " << error_code.message() << std::endl;
+			std::cout << "[Server] Failed to close acceptor: " << error_code.message() << std::endl;
 		}
 
 		auto clients_copy = clients;
@@ -61,12 +61,12 @@ namespace pine
 			disconnect_client(client.first);
 		}
 
-		std::cout << "Socket stopped listening" << std::endl;
+		std::cout << "[Server] Socket stopped listening" << std::endl;
 	}
 
 	async_task server::accept_clients()
 	{
-		std::cout << "Socket starts listening" << std::endl;
+		std::cout << "[Server] Socket starts listening" << std::endl;
 
 		while (is_listening)
 		{
@@ -76,7 +76,7 @@ namespace pine
 
 			if (error_code)
 			{
-				std::cout << "Failed to accept client: " << error_code.message() <<
+				std::cout << "[Server] Failed to accept client: " << error_code.message() <<
 					std::endl;
 				continue;
 			}
@@ -93,7 +93,7 @@ namespace pine
 			}
 		}
 
-		std::cout << "Socket stops listening" << std::endl;
+		std::cout << "[Server] Socket stops listening" << std::endl;
 
 		co_return;
 	}

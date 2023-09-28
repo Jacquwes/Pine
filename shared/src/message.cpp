@@ -1,8 +1,8 @@
+#include <algorithm>
 #include <cstdint>
 #include <vector>
 
 #include "message.h"
-#include "snowflake.h"
 
 namespace pine::socket_messages
 {
@@ -13,12 +13,12 @@ namespace pine::socket_messages
 
 	void message_header::parse(std::vector<uint8_t> const& buffer)
 	{
-		std::memcpy(&body_size, &buffer[1], sizeof(body_size));
+		std::copy_n(buffer.begin() + sizeof(type), sizeof(body_size), reinterpret_cast<uint8_t*>(&body_size));
 
 		type = static_cast<message_type>(buffer[0]);
 
 		uint64_t new_id = 0;
-		std::memcpy(&new_id, &buffer[sizeof(type) + sizeof(body_size)], sizeof(new_id));
+		std::copy_n(buffer.begin() + sizeof(type) + sizeof(body_size), sizeof(new_id), reinterpret_cast<uint8_t*>(&new_id));
 		id = new_id;
 	}
 
@@ -30,13 +30,13 @@ namespace pine::socket_messages
 		buffer.resize(size);
 
 		// copy body size
-		std::memcpy(&buffer[sizeof(type)], &body_size, sizeof(body_size));
+		std::copy_n(reinterpret_cast<uint8_t const*>(&body_size), sizeof(body_size), buffer.begin() + sizeof(type));
 
 		// copy message id
 		uint64_t new_id = id;
 
-		std::memcpy(&buffer[sizeof(type) + sizeof(body_size)], &new_id, sizeof(new_id));
-		
+		std::copy_n(reinterpret_cast<uint8_t const*>(&new_id), sizeof(new_id), buffer.begin() + sizeof(type) + sizeof(body_size));
+
 		return buffer;
 	}
 

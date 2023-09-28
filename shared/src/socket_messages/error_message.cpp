@@ -1,5 +1,6 @@
 #include "socket_messages/error_message.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <vector>
 

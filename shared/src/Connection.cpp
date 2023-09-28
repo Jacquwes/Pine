@@ -1,65 +1,65 @@
-#include <bit>
+#include <cstdint>
+#include <exception>
 #include <iostream>
-#include <memory>
 #include <vector>
 
-#include <winerror.h>
-#include <WinSock2.h>
-#include <cstdint>
+#include <asio.hpp>
 
 #include "connection.h"
 #include "coroutine.h"
-#include "message.h"
 #include "snowflake.h"
 #include "socket_messages.h"
 
 namespace pine
 {
+	connection::connection(asio::ip::tcp::socket& socket) :
+		socket(std::move(socket))
+	{
+		std::cout << "New connection: " << id << std::endl;
+	}
+
 	connection::~connection()
 	{
 		std::cout << "Closing connection: " << id << std::endl;
 
-		if (socket != INVALID_SOCKET)
-		{
-			shutdown(socket, SD_BOTH);
-			closesocket(socket);
-		}
+		close();
 	}
 
-
-
-	async_operation<std::vector<uint8_t>> connection::receive_raw_message(uint64_t const& bufferSize) const
+	async_operation<std::vector<uint8_t>> connection::receive_raw_message(uint64_t const& bufferSize)
 	{
 		std::vector<uint8_t> buffer(bufferSize, 0);
 
 		if (!bufferSize)
 			co_return buffer;
 
-		int n = recv(socket, std::bit_cast<char*>(buffer.data()), static_cast<int>(bufferSize), 0);
-		if (n == SOCKET_ERROR)
+		asio::error_code ec;
+		auto flags = asio::socket_base::message_peek;
+		size_t n = socket.receive(asio::buffer(buffer), flags, ec);
+
+		if (ec && ec != asio::error::connection_reset)
 		{
-			int error = WSAGetLastError();
-
-			if (error == WSAECONNRESET || error == WSAECONNABORTED)
-			{
-				co_return buffer;
-			}
-
-			throw "Failed to receive message: " + WSAGetLastError();
+			std::cout << "Failed to receive message: " << std::dec << ec.value() << " -> " << ec.message() << std::endl;
+			co_return buffer;
 		}
 
 		buffer.resize(n);
+
 		co_return buffer;
 	}
 
 
-
-	async_task connection::send_raw_message(std::vector<uint8_t> const& buffer) const
+	async_task connection::send_raw_message(std::vector<uint8_t> const& buffer)
 	{
-		int n = send(socket, std::bit_cast<char*>(buffer.data()), static_cast<int>(buffer.size()), 0);
-		if (n == SOCKET_ERROR)
+		if (buffer.empty())
+			co_return;
+
+		try {
+			socket.send(asio::buffer(buffer));
+		}
+		catch (std::exception const& e)
 		{
-			throw "Failed to send message: " + WSAGetLastError();
+			std::cout << "Failed to send message: " << e.what() << std::endl;
+			co_return;
 		}
 
 		co_return;
@@ -130,7 +130,6 @@ namespace pine
 
 		default:
 			co_return message;
-			break;
 		}
 
 
@@ -145,10 +144,15 @@ namespace pine
 
 
 
-	async_task connection::send_message(std::shared_ptr<socket_messages::message> const& message) const
+	async_task connection::send_message(std::shared_ptr<socket_messages::message> const& message)
 	{
 		std::vector<uint8_t> buffer = message->serialize();
 
 		co_await send_raw_message(buffer);
+	}
+
+	void connection::close()
+	{
+		socket.close();
 	}
 }

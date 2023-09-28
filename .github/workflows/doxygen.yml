@@ -1,0 +1,52 @@
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "master", "api-v2", "asio" ]
+    paths:
+    - '**.h'
+    - '**.md'
+    - '**doxygen.yml'
+    - '**doxyfile'
+  pull_request:
+    branches: [ "master", "api-v2", "asio" ]
+    paths:
+    - '**.h'
+    - '**.md'
+    - '**doxygen.yml'
+    - '**doxyfile'
+
+name: Build doxygen documentation
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+  
+    - name: Install Doxygen and Dot
+      run: sudo apt install doxygen graphviz
+
+    - name: Run doxygen
+      run: doxygen doxyfile  
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: docs/html
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+    - build
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Deploy to Github Pages
+      id: deployment
+      uses: actions/deploy-pages@v2

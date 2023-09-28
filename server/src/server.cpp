@@ -1,90 +1,103 @@
-#include <ios>
+#include <cstdint>
 #include <iostream>
 #include <memory>
-#include <string>
 #include <string_view>
+#include <string>
 #include <type_traits>
 
-#include <connection.h>
-#include <message.h>
-#include <WinSock2.h>
-#include <ws2tcpip.h>
+#include <asio/io_context.hpp>
+#include <asio/ip/tcp.hpp>
+#include <coroutine.h>
 
-#include "server_connection.h"
 #include "server.h"
+#include "server_connection.h"
 
 namespace pine
 {
-	void server::run(std::string_view const& port)
+	server::server(asio::io_context& context, uint16_t const& port)
+		: io_context{ context },
+		acceptor(context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
+	{}
+
+	void server::listen()
 	{
-		if (!init_socket(port))
+		is_listening = true;
+
+		if (!acceptor.is_open())
+			acceptor.open(asio::ip::tcp::v4(), error_code);
+
+		if (error_code)
 		{
-			throw "Failed to initialize socket: " + std::to_string(WSAGetLastError());
+			std::cout << "Failed to open acceptor: " << error_code.message() << std::endl;
+			return;
 		}
 
-		std::cout << "Pine - version " << std::hex << current_version << "\nServer Listening" << std::endl;
-
-		stop_listening = false;
-
-		delete_clients();
-
-		while (!stop_listening)
-		{
-			SOCKET client_socket = accept(socket, nullptr, nullptr);
-
-			if (stop_listening)
-				break;
-
-			if (client_socket == INVALID_SOCKET)
-			{
-				closesocket(socket);
-				WSACleanup();
-				throw "Failed to accept client: " + std::to_string(WSAGetLastError());
-			}
-
-			auto client = std::make_shared<server_connection>(client_socket, *this);
-			client->listen();
-
-			std::unique_lock lock{ mutate_clients_mutex };
-			clients.insert({ client->id, std::move(client) });
-		}
+		accept_clients();
 
 		std::cout << "Socket stops listening" << std::endl;
 	}
 
-
-
 	void server::stop()
 	{
-		stop_listening = true;
+		is_listening = false;
+
+		acceptor.cancel(error_code);
+
+		if (error_code)
+		{
+			std::cout << "Failed to cancel acceptor: " << error_code.message() << std::endl;
+		}
+
+		acceptor.close(error_code);
+
+		if (error_code)
+		{
+			std::cout << "Failed to close acceptor: " << error_code.message() << std::endl;
+		}
 
 		for (auto const& client : clients)
 		{
 			disconnect_client(client.first);
 		}
 
-		shutdown(socket, SD_BOTH);
-		closesocket(socket);
-		WSACleanup();
+		std::cout << "Socket stopped listening" << std::endl;
 	}
 
-
-
-	async_task server::delete_clients()
+	async_task server::accept_clients()
 	{
-		co_await switch_thread(delete_clients_thread);
+		std::cout << "Socket starts listening" << std::endl;
 
-		while (!stop_listening)
+		while (is_listening)
 		{
-			std::unique_lock lock{ delete_clients_mutex };
-			delete_clients_cv.wait(lock);
-			clients_to_delete.clear();
+			asio::ip::tcp::socket client_socket{ io_context };
+
+			acceptor.accept(client_socket, error_code);
+
+			if (error_code)
+			{
+				std::cout << "Failed to accept client: " << error_code.message() <<
+					std::endl;
+				continue;
+			}
+
+			if (!is_listening)
+				break;
+
+			auto client = std::make_shared<server_connection>(client_socket, *this);
+			client->listen();
+
+			{
+				std::unique_lock lock{ mutate_clients_mutex };
+				clients.insert({ client->id, std::move(client) });
+			}
 		}
+
+		std::cout << "Socket stops listening" << std::endl;
+
+		co_return;
 	}
 
-
-
-	async_task server::disconnect_client(uint64_t client_id)
+	async_task server::disconnect_client(uint64_t const& client_id)
 	{
 		std::unique_lock lock{ mutate_clients_mutex };
 
@@ -95,81 +108,16 @@ namespace pine
 			co_return;
 		}
 
-		closesocket(client->second->socket);
-		shutdown(client->second->socket, SD_BOTH);
-
-		clients_to_delete.push_back(std::move(client->second));
-
 		clients.erase(client_id);
 
-		delete_clients_cv.notify_one();
-
 		co_return;
 	}
 
-
-
-	async_task server::message_client(std::shared_ptr<connection> const& client, std::shared_ptr<socket_messages::message> const& message) const
+	async_task server::message_client(
+		std::shared_ptr<connection> const& client,
+		std::shared_ptr<socket_messages::message> const& message
+	) const
 	{
 		co_await client->send_message(message);
-	}
-
-
-
-	async_task server::on_connect(std::shared_ptr<connection> const& client) const
-	{
-		std::cout << "  Client connected: " << std::dec << client->id << std::endl;
-
-		co_return;
-	}
-
-
-
-	bool server::init_socket(std::string_view const& port)
-	{
-
-		WSADATA data = { 0 };
-
-		if (int i = WSAStartup(MAKEWORD(2, 2), &data); i)
-		{
-			return false;
-		}
-
-		if (LOBYTE(data.wVersion) != 2 || HIBYTE(data.wVersion) != 2)
-		{
-			WSACleanup();
-			return false;
-		}
-
-		addrinfo* local_address = nullptr;
-		addrinfo hints =
-		{
-			.ai_family = AF_INET,
-			.ai_socktype = SOCK_STREAM,
-			.ai_protocol = IPPROTO_TCP,
-		};
-
-		if (int i = getaddrinfo(nullptr, port.data(), &hints, &local_address); i)
-		{
-			WSACleanup();
-			return false;
-		}
-
-		if (socket = ::socket(local_address->ai_family, local_address->ai_socktype, local_address->ai_protocol); socket == INVALID_SOCKET)
-		{
-			freeaddrinfo(local_address);
-			WSACleanup();
-			return false;
-		}
-
-		if (bind(socket, local_address->ai_addr, static_cast<int>(local_address->ai_addrlen)) == SOCKET_ERROR || listen(socket, SOMAXCONN) == SOCKET_ERROR)
-		{
-			freeaddrinfo(local_address);
-			closesocket(socket);
-			WSACleanup();
-			return false;
-		}
-
-		return true;
 	}
 }

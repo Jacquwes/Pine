@@ -1,5 +1,6 @@
 #include "socket_messages/keep_alive_message.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <vector>
 
@@ -24,7 +25,7 @@ namespace pine::socket_messages
 		return header.serialize();
 	}
 
-	size_t keep_alive_message::get_body_size() const
+	uint64_t keep_alive_message::get_body_size() const
 	{
 		return 0;
 	}

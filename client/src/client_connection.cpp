@@ -1,47 +1,38 @@
-#pragma once
+#include <cstdint>
+#include <string>
 
-#include <iostream>
-#include <WinSock2.h>
-#include <WS2tcpip.h>
+#include <asio.hpp>
+#include <connection.h>
 
-#include "Connection.h"
-#include "Snowflake.h"
+#include "client_connection.h"
 
-ClientConnection::ClientConnection()
-{}
-
-bool ClientConnection::Connect()
+namespace pine
 {
-	addrinfo hints{};
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
+	client_connection::client_connection(asio::ip::tcp::socket& client_socket)
+		: connection{ client_socket }
+	{}
 
-	addrinfo* result = nullptr;
-	int i = getaddrinfo("localhost", "45321", &hints, &result);
-	if (i)
+	bool client_connection::connect(std::string const& host, uint16_t const& port)
 	{
-		WSACleanup();
-		return false;
+		asio::ip::tcp::resolver::query resolver_query(
+			host,
+			std::to_string(port),
+			asio::ip::tcp::resolver::query::numeric_service
+		);
+
+		asio::ip::tcp::resolver resolver{ socket.get_executor() };
+
+		asio::ip::tcp::resolver::iterator it =
+			resolver.resolve(resolver_query, ec);
+
+		if (ec)
+			return false;
+
+		asio::connect(socket, it, ec);
+
+		if (ec)
+			return false;
+
+		return true;
 	}
-
-	m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-	if (m_socket == INVALID_SOCKET)
-	{
-		freeaddrinfo(result);
-		WSACleanup();
-		return false;
-	}
-
-	i = connect(m_socket, result->ai_addr, static_cast<int>(result->ai_addrlen));
-	if (i == SOCKET_ERROR)
-	{
-		closesocket(m_socket);
-		m_socket = INVALID_SOCKET;
-		return false;
-	}
-
-	freeaddrinfo(result);
-
-	return true;
 }

@@ -1,7 +1,9 @@
 #include "socket_messages/ack_message.h"
 
 #include <bit>
+#include <algorithm>
 #include <cstdint>
+#include <ranges>
 #include <vector>
 
 #include "message.h"

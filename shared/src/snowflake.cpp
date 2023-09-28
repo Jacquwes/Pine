@@ -2,7 +2,7 @@
 
 #include <chrono>
 #include <cstdint>
-#include <ostream>
+#include <iosfwd>
 
 namespace pine
 {
@@ -48,21 +48,13 @@ namespace pine
 			&& value.sequence == other.value.sequence;
 	}
 
+	bool snowflake::operator !=(uint64_t const& other) const
+	{
+		return !(*this == other);
+	}
+
 	bool snowflake::operator ==(uint64_t const& other) const
 	{
 		return static_cast<uint64_t>(*this) == other;
-	}
-
-	constexpr snowflake::operator uint64_t() const
-	{
-		return (value.timestamp << 22)
-			| (value.worker_id << 17)
-			| (value.process_id << 12)
-			| value.sequence;
-	}
-
-	std::ostream& operator<<(std::ostream& out, snowflake const& snowflake)
-	{
-		return out << static_cast<uint64_t>(snowflake);
 	}
 }

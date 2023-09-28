@@ -9,3 +9,5 @@ file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
 add_library(shared STATIC ${HEADER_FILES} ${SOURCE_FILES})
 
 target_include_directories(shared PUBLIC include)
+
+target_link_libraries(shared PRIVATE asio)

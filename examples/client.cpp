@@ -1,15 +1,20 @@
 #include <iostream>
 
 #include <asio.hpp>
-#include <client_connection.h>
+#include <client.h>
 
 int main()
 {
 	asio::io_context context;
-	asio::ip::tcp::socket socket(context);
-	pine::client_connection client(socket);
+	pine::client client("Example", context);
 
-	client.connect("localhost");
-
-	while (true);
+	if (client.connect("localhost"))
+	{
+		std::cout << "Connected to server" << std::endl;
+	}
+	else
+	{
+		std::cout << "Failed to connect to server" << std::endl;
+		return 1;
+	}
 }

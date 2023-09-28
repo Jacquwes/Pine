@@ -10,10 +10,8 @@ namespace pine
 		: connection{ client_socket }
 	{}
 
-	async_operation<bool> client_connection::connect(std::string const& host, uint16_t const& port)
+	bool client_connection::connect(std::string const& host, uint16_t const& port)
 	{
-		co_await switch_thread(client_thread);
-
 		asio::ip::tcp::resolver::query resolver_query(
 			host,
 			std::to_string(port),
@@ -26,13 +24,13 @@ namespace pine
 			resolver.resolve(resolver_query, ec);
 
 		if (ec)
-			co_return false;
+			return false;
 
 		asio::connect(socket, it, ec);
 
 		if (ec)
-			co_return false;
+			return false;
 
-		co_return true;
+		return true;
 	}
 }

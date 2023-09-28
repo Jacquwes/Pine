@@ -16,7 +16,7 @@ namespace pine
 	public:
 		client_connection(asio::ip::tcp::socket& socket);
 
-		async_operation<bool> connect(std::string const& host, uint16_t const& port = 80);
+		bool connect(std::string const& host, uint16_t const& port = 80);
 
 		asio::error_code ec;
 

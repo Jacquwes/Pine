@@ -55,7 +55,8 @@ namespace pine
 			std::cout << "Failed to close acceptor: " << error_code.message() << std::endl;
 		}
 
-		for (auto const& client : clients)
+		auto clients_copy = clients;
+		for (auto& client : clients_copy)
 		{
 			disconnect_client(client.first);
 		}

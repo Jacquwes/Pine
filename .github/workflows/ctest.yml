@@ -5,7 +5,7 @@ name: CTest on multiple platforms
 on:
   workflow_dispatch:
   push:
-    branches: [ "master", "asio" ]
+    branches: [ "master", "api-v2", "asio" ]
     paths:
     - '**.cpp'
     - '**.h'
@@ -13,7 +13,13 @@ on:
     - '**.c'
     - '**/CMakeLists.txt'
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "api-v2", "asio" ]
+    paths:
+    - '**.cpp'
+    - '**.h'
+    - '**.hpp'
+    - '**.c'
+    - '**/CMakeLists.txt'
 
 jobs:
   build:

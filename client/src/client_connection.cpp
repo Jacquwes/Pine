@@ -37,4 +37,23 @@ namespace pine
 
 		return true;
 	}
+
+	void client_connection::disconnect()
+	{
+		socket.close(ec);
+	}
+
+	async_task client_connection::listen()
+	{
+		while (true)
+		{
+			auto message = co_await receive_message();
+
+			if (message->header.type == socket_messages::INVALID_MESSAGE)
+				break;
+
+			for (auto const& callback : client_ref.on_message_callbacks)
+				co_await callback(message);
+		}
+	}
 }

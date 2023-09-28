@@ -14,6 +14,7 @@ if (WIN32)
 	add_definitions(-D_WIN32_WINNT=0x0A00)
 endif()
 
+add_subdirectory(examples)
 add_subdirectory(shared)
 add_subdirectory(server)
 add_subdirectory(tests)

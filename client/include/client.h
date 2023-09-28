@@ -24,7 +24,7 @@ namespace pine
 	public:
 		/// @brief Initialize a client.
 		/// @param username: The username of the client.
-		client(std::string username);
+		client(std::string username, asio::io_context& io_context);
 
 		/// @brief Connect to a server.
 		/// @param host: Hostname or ip address of the server.
@@ -49,7 +49,6 @@ namespace pine
 		constexpr user const& get_user() const;
 
 	private:
-		asio::ip::tcp::socket socket;
 		std::jthread connection_thread;
 
 		std::vector<
@@ -58,7 +57,7 @@ namespace pine
 			)>
 		> on_message_callbacks;
 
-		asio::io_context io_context;
+		asio::io_context& io_context;
 		std::unique_ptr<client_connection> connection;
 		user user_data;
 	};

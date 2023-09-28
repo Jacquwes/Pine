@@ -13,11 +13,10 @@
 
 namespace pine
 {
-	client::client(std::string username)
-		: connection{ std::make_unique<client_connection>(socket) },
+	client::client(std::string username, asio::io_context& io_context)
+		: connection{ std::make_unique<client_connection>(*this, io_context) },
 		user_data{ username },
-		io_context{},
-		socket{ io_context }
+		io_context{ io_context }
 	{}
 
 	bool client::connect(std::string const& host, uint16_t const& port)

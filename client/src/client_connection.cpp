@@ -5,11 +5,13 @@
 #include <connection.h>
 
 #include "client_connection.h"
+#include "client.h"
 
 namespace pine
 {
-	client_connection::client_connection(asio::ip::tcp::socket& client_socket)
-		: connection{ client_socket }
+	client_connection::client_connection(client& client, asio::io_context& io_context)
+		: connection{ asio::ip::tcp::socket{ io_context } },
+		client_ref{ client }
 	{}
 
 	bool client_connection::connect(std::string const& host, uint16_t const& port)
@@ -20,7 +22,7 @@ namespace pine
 			asio::ip::tcp::resolver::query::numeric_service
 		);
 
-		asio::ip::tcp::resolver resolver{ socket.get_executor() };
+		asio::ip::tcp::resolver resolver{ client_ref.io_context };
 
 		asio::ip::tcp::resolver::iterator it =
 			resolver.resolve(resolver_query, ec);

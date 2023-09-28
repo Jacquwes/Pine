@@ -18,6 +18,10 @@ namespace pine
 
 		bool connect(std::string const& host, uint16_t const& port = 80);
 
+		void disconnect();
+
+		async_task listen();
+
 		asio::error_code ec;
 
 	private:

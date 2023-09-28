@@ -1,6 +1,8 @@
+#include <cstdint>
+#include <string>
 
 #include <asio.hpp>
-#include <coroutine.h>
+#include <connection.h>
 
 #include "client_connection.h"
 

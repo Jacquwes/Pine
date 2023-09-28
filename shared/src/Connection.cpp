@@ -32,16 +32,17 @@ namespace pine
 		if (!bufferSize)
 			co_return buffer;
 
-		try
+		asio::error_code ec;
+		auto flags = asio::socket_base::message_peek;
+		size_t n = socket.receive(asio::buffer(buffer), flags, ec);
+
+		if (ec && ec != asio::error::connection_reset)
 		{
-			size_t n = socket.receive(asio::buffer(buffer));
-			buffer.resize(n);
-		}
-		catch (std::exception& e)
-		{
-			std::cout << "Failed to receive message: " << e.what() << std::endl;
+			std::cout << "Failed to receive message: " << std::dec << ec.value() << " -> " << ec.message() << std::endl;
 			co_return buffer;
 		}
+
+		buffer.resize(n);
 
 		co_return buffer;
 	}

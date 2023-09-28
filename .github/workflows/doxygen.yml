@@ -6,8 +6,8 @@ on:
     paths:
     - '**.h'
     - '**.md'
-    - 'doxygen.yml'
-    - 'doxyfile'
+    - '**doxygen.yml'
+    - '**doxyfile'
 
 name: Build doxygen documentation
 jobs:
@@ -27,7 +27,7 @@ jobs:
     steps:
     - name: Fix permissions
       run: |
-        chmod -c -R +rX "_site/" | while read line; do
+        chmod -c -R +rX "docs/" | while read line; do
           echo "::warning title=Invalid file permissions automatically fixed::$line"
         done
 

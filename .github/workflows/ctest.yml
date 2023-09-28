@@ -5,6 +5,12 @@ name: CTest on multiple platforms
 on:
   push:
     branches: [ "master", "asio" ]
+    paths:
+    - '**.cpp'
+    - '**.h'
+    - '**.hpp'
+    - '**.c'
+    - '**/CMakeLists.txt'
   pull_request:
     branches: [ "master" ]
 

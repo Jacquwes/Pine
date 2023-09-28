@@ -9,6 +9,11 @@ on:
     - '**doxygen.yml'
     - '**doxyfile'
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 name: Build doxygen documentation
 jobs:
   build:

@@ -114,10 +114,34 @@ namespace pine
 	}
 
 	async_task server::message_client(
-		std::shared_ptr<connection> const& client,
+		std::shared_ptr<server_connection> const& client,
 		std::shared_ptr<socket_messages::message> const& message
 	) const
 	{
 		co_await client->send_message(message);
+	}
+
+	server& server::on_message(std::function<async_task(server&, std::shared_ptr<server_connection>const&, std::shared_ptr<socket_messages::message>const&)> const& callback)
+	{
+		on_message_callbacks.push_back(callback);
+		return *this;
+	}
+
+	server& server::on_connection_attempt(std::function<async_task(server&, std::shared_ptr<server_connection>const&)> const& callback)
+	{
+		on_connection_attemps_callbacks.push_back(callback);
+		return *this;
+	}
+
+	server& server::on_connection_failed(std::function<async_task(server&, std::shared_ptr<server_connection>const&)> const& callback)
+	{
+		on_connection_failed_callbacks.push_back(callback);
+		return *this;
+	}
+
+	server& server::on_connection(std::function<async_task(server&, std::shared_ptr<server_connection>const&)> const& callback)
+	{
+		on_connection_callbacks.push_back(callback);
+		return *this;
 	}
 }

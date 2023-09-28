@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <mutex>
 #include <string_view>
 #include <thread>
@@ -15,7 +16,7 @@ namespace pine
     class server;
 
     /// @brief A connection to a client.
-    class server_connection : public connection
+    class server_connection : public connection, public std::enable_shared_from_this<server_connection>
     {
     public:
         /// @brief Construct a server connection with the given socket and server.

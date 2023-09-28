@@ -13,7 +13,7 @@
 
 namespace pine
 {
-	async_task server::on_message(std::shared_ptr<connection> client, std::shared_ptr<socket_messages::message> message)
+	async_task server::handle_message(std::shared_ptr<server_connection> const& client, std::shared_ptr<socket_messages::message> const& message)
 	{
 		std::cout << "  Message received from client: " << std::dec << client->id << std::endl;
 
@@ -36,17 +36,8 @@ namespace pine
 		case SEND_CHAT_MESSAGE:
 		{
 			std::cout << "  Received chat message from client: " << std::dec << client->id << std::endl;
-			auto receive_chat = std::make_shared<socket_messages::receive_chat_message>();
-			receive_chat->author_username = client->user_data.username;
-			receive_chat->message_content = std::dynamic_pointer_cast<socket_messages::send_chat_message>(message)->message_content;
-
-			for (auto const& i : clients)
-			{
-				if (client->id == i.first)
-					continue;
-				co_await std::dynamic_pointer_cast<server_connection>(client)->send_message(receive_chat);
-			}
-
+			for (auto& callback : on_message_callbacks)
+				co_await callback(*this, client, message);
 			break;
 		}
 

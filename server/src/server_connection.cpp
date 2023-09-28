@@ -23,7 +23,7 @@ namespace pine
 		server& server
 	)
 		: server_ref{ server },
-		connection{ client_socket }
+		connection{ std::move(client_socket) }
 	{
 
 		std::cout << "New client connection opened: " << std::dec << id << std::endl;
@@ -35,6 +35,9 @@ namespace pine
 
 		std::scoped_lock lock(connection_mutex);
 
+		for (auto& callback : server_ref.on_connection_attemps_callbacks)
+			callback(server_ref, server_connection::shared_from_this());
+
 		if (!(co_await establish_connection()))
 		{
 			close();
@@ -43,6 +46,9 @@ namespace pine
 
 		std::cout << "  Client successfully connected: " << std::dec << id << std::endl;
 		is_connected = true;
+
+		for (auto& callback : server_ref.on_connection_callbacks)
+			callback(server_ref, shared_from_this());
 
 		while (is_connected)
 		{
@@ -54,7 +60,7 @@ namespace pine
 				co_return;
 			}
 
-			server_ref.on_message(shared_from_this(), message);
+			server_ref.handle_message(shared_from_this(), message);
 		}
 	}
 

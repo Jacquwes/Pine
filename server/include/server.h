@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <string_view>
@@ -12,7 +13,6 @@
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 
-#include <connection.h>
 #include <coroutine.h>
 #include <message.h>
 
@@ -44,13 +44,41 @@ namespace pine
 		/// @param client Client to send the message to.
 		/// @param message Message to send.
 		/// @return An asynchronous task completed when the message has been sent.
-		async_task message_client(std::shared_ptr<connection> const& client, std::shared_ptr<socket_messages::message> const& message) const;
+		async_task message_client(std::shared_ptr<server_connection> const& client, std::shared_ptr<socket_messages::message> const& message) const;
 
-		/// @brief Function called when a client sends a message to the server.
-		/// @param client Client that sent the message.
-		/// @param message Message sent by the client.
-		/// @return An asynchronous task completed when the message has been processed.
-		async_task on_message(std::shared_ptr<connection> client, std::shared_ptr<socket_messages::message> message);
+		/// @brief Call this function to add a callback that will be executed when a client sends 
+		/// a valid message to the server.
+		/// @return A reference to this server.
+		server& on_message(std::function < async_task(
+			server&,
+			std::shared_ptr<server_connection> const&,
+			std::shared_ptr<socket_messages::message> const&)> const& callback
+		);
+
+		/// @brief Call this function to add a callback that will be executed when a new client attemps
+		/// to connect to the server.
+		/// @return A reference to this server.
+		server& on_connection_attempt(std::function < async_task(
+			server&,
+			std::shared_ptr<server_connection> const&)> const& callback
+		);
+
+		/// @brief Call this function to add a callback that will be executed when a client fails
+		/// to connect to the server.
+		/// @return A reference to this server.
+		server& on_connection_failed(std::function < async_task(
+			server&,
+			std::shared_ptr<server_connection> const&)> const& callback
+		);
+
+		/// @brief Call this function to add a callback that will be executed when a client successfully
+		/// connects to the server.
+		/// @return A reference to this server.
+		server& on_connection(std::function < async_task(
+			server&,
+			std::shared_ptr<server_connection> const&)> const& callback
+		);
+
 
 	private:
 		/// @brief Accept clients.
@@ -58,10 +86,15 @@ namespace pine
 		/// @return An asynchronous task completed when the server has stopped listening.
 		async_task accept_clients();
 
+		/// @brief Function called when a client sends a message to the server.
+		/// @return 
+		async_task handle_message(std::shared_ptr<server_connection> const& client, std::shared_ptr<socket_messages::message> const& message);
+
 		std::mutex delete_clients_mutex;
 		std::mutex mutate_clients_mutex;
 
 		std::unordered_map<uint64_t, std::shared_ptr<server_connection>> clients;
+
 
 		bool is_listening = false;
 		std::jthread acceptor_thread;
@@ -70,5 +103,27 @@ namespace pine
 		asio::io_context& io_context;
 		asio::ip::tcp::acceptor acceptor;
 		asio::error_code error_code;
+
+	private:
+		std::vector<std::function<async_task(
+			server&,
+			std::shared_ptr<server_connection> const&,
+			std::shared_ptr<socket_messages::message> const&)>
+		> on_message_callbacks;
+
+		std::vector<std::function<async_task(
+			server&,
+			std::shared_ptr<server_connection> const&)>
+		> on_connection_attemps_callbacks;
+
+		std::vector<std::function<async_task(
+			server&,
+			std::shared_ptr<server_connection> const&)>
+		> on_connection_failed_callbacks;
+
+		std::vector<std::function<async_task(
+			server&,
+			std::shared_ptr<server_connection> const&)>
+		> on_connection_callbacks;
 	};
 }

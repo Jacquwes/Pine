@@ -22,23 +22,6 @@ jobs:
     - name: Run doxygen
       run: doxygen doxyfile  
 
-    - name: gh-pages branch creation if needed
-      id: gh-pages-branch-creation
-      shell: bash
-      run: |
-        echo "::group::Checking if gh-pages branch exists"
-        if [[ -z $(git ls-remote --heads origin gh-pages) ]]; then
-           echo "Creating gh-pages branch"
-           git checkout --orphan gh-pages
-           git reset --hard
-           git commit --allow-empty -m "First commit to create gh-pages branch"
-           git push origin gh-pages
-           echo "Created gh-pages branch"
-        else
-           echo "Branch gh-pages already exists"
-        fi
-        echo "::endgroup::"
-
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v2
       with:

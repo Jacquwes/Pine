@@ -1,3 +1,4 @@
+#include <semaphore>
 #include <thread>
 
 #include <asio.hpp>
@@ -14,28 +15,43 @@ int main(int argc, char** argv)
 
 TEST(integration_tests, connect_client_to_server)
 {
+	std::binary_semaphore server_ready(0);
+
 	asio::io_context io_context;
+	pine::server server(io_context);
 
 	std::jthread server_thread([&]()
 		{
-			pine::server server(io_context);
-
-			server.on_connection_attempt([](auto& server, auto& client) -> async_task
+			server.on_connection_attempt(
+				[&](
+					pine::server& server,
+					std::shared_ptr<pine::server_connection> const& client
+					) -> async_task
 				{
-					server.stop();
-					SUCCEED();
+					server_ready.release();
+					co_return;
+				});
+
+			server.on_ready(
+				[&](pine::server& server) -> async_task
+				{
+					server_ready.release();
 					co_return;
 				});
 
 			server.listen();
-
-			FAIL();
 		});
 
 	pine::client client("test", io_context);
 
-	if(!client.connect())
-		FAIL();
+	server_ready.acquire();
 
-	client.disconnect();
+	if (!client.connect())
+		ADD_FAILURE();
+
+	server_ready.acquire();
+
+	server.stop();
+
+	server_thread.join();
 }

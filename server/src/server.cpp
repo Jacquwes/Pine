@@ -68,6 +68,11 @@ namespace pine
 	{
 		std::cout << "[Server] Socket starts listening" << std::endl;
 
+		for (auto& callback : on_ready_callbacks)
+		{
+			co_await callback(*this);
+		}
+
 		while (is_listening)
 		{
 			asio::ip::tcp::socket client_socket{ io_context };
@@ -142,6 +147,12 @@ namespace pine
 	server& server::on_connection(std::function<async_task(server&, std::shared_ptr<server_connection>const&)> const& callback)
 	{
 		on_connection_callbacks.push_back(callback);
+		return *this;
+	}
+
+	server& server::on_ready(std::function<async_task(server&)> const& callback)
+	{
+		on_ready_callbacks.push_back(callback);
 		return *this;
 	}
 }

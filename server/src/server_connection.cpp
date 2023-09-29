@@ -170,11 +170,11 @@ namespace pine
 		if (std::this_thread::get_id() == listen_thread.get_id())
 			co_await switch_thread(listen_thread);
 
+		this->socket.close();
+
 		std::scoped_lock lock(connection_mutex);
 
 		std::cout << "[Server]   Closing connection: " << std::dec << id << std::endl;
-
-		this->socket.close();
 
 		server_ref.disconnect_client(id);
 

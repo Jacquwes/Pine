@@ -40,7 +40,7 @@ namespace pine
 
 	void client_connection::disconnect()
 	{
-		socket.close(ec);
+		this->close();
 	}
 
 	async_task client_connection::listen()

@@ -113,6 +113,8 @@ namespace pine
 			co_return;
 		}
 
+		client->second->close();
+
 		clients.erase(client_id);
 
 		co_return;

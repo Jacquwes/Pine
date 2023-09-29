@@ -34,7 +34,7 @@ namespace pine
 
 		accept_clients();
 
-		std::cout << "[Server] Socket stops listening" << std::endl;
+		std::cout << "[Server] Stopped listening" << std::endl;
 	}
 
 	void server::stop()
@@ -61,7 +61,7 @@ namespace pine
 			disconnect_client(client.first);
 		}
 
-		std::cout << "[Server] Socket stopped listening" << std::endl;
+		std::cout << "[Server] Socket stopped" << std::endl;
 	}
 
 	async_task server::accept_clients()
@@ -85,6 +85,7 @@ namespace pine
 				break;
 
 			auto client = std::make_shared<server_connection>(client_socket, *this);
+
 			client->listen();
 
 			{
@@ -92,8 +93,6 @@ namespace pine
 				clients.insert({ client->id, std::move(client) });
 			}
 		}
-
-		std::cout << "[Server] Socket stops listening" << std::endl;
 
 		co_return;
 	}

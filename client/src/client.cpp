@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <thread>
@@ -36,6 +37,10 @@ namespace pine
 	void client::disconnect()
 	{
 		connection->disconnect();
+		if (connection_thread.joinable())
+			connection_thread.join();
+
+		std::cout << "[Client] Disconnected from server" << std::endl;
 	}
 
 	async_task client::message_server(std::shared_ptr<socket_messages::message> const& message) const

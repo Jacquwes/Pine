@@ -19,11 +19,7 @@ namespace pine
 	}
 
 	connection::~connection()
-	{
-		std::cout << "[Connection] Closing connection: " << id << std::endl;
-
-		close();
-	}
+	{}
 
 	async_operation<std::vector<uint8_t>> connection::receive_raw_message(uint64_t const& bufferSize)
 	{
@@ -36,7 +32,7 @@ namespace pine
 		auto flags = asio::socket_base::message_peek;
 		size_t n = socket.receive(asio::buffer(buffer), flags, ec);
 
-		if (ec && ec != asio::error::connection_reset)
+		if (ec && ec != asio::error::connection_reset && ec != asio::error::connection_aborted)
 		{
 			std::cout << "[Connection] Failed to receive message: " << std::dec << ec.value() << " -> " << ec.message() << std::endl;
 			co_return buffer;
@@ -53,12 +49,12 @@ namespace pine
 		if (buffer.empty())
 			co_return;
 
-		try {
-			socket.send(asio::buffer(buffer));
-		}
-		catch (std::exception const& e)
+		asio::error_code ec;
+		socket.send(asio::buffer(buffer), {}, ec);
+
+		if (ec && ec != asio::error::connection_reset && ec != asio::error::connection_aborted)
 		{
-			std::cout << "[Connection] Failed to send message: " << e.what() << std::endl;
+			std::cout << "[Connection] Failed to send message: " << std::dec << ec.value() << " -> " << ec.message() << std::endl;
 			co_return;
 		}
 

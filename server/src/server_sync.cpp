@@ -64,13 +64,13 @@ namespace pine
 		std::cout << "[Server] Socket stopped" << std::endl;
 	}
 
-	async_task server::accept_clients()
+	void server::accept_clients()
 	{
 		std::cout << "[Server] Socket starts listening" << std::endl;
 
 		for (auto& callback : on_ready_callbacks)
 		{
-			co_await callback(*this);
+			callback(*this);
 		}
 
 		while (is_listening)
@@ -81,8 +81,7 @@ namespace pine
 
 			if (error_code)
 			{
-				std::cout << "[Server] Failed to accept client: " << error_code.message() <<
-					std::endl;
+				std::cout << "[Server] Failed to accept client: " << error_code.message() << std::endl;
 				continue;
 			}
 
@@ -93,66 +92,58 @@ namespace pine
 
 			client->listen();
 
-			{
-				std::unique_lock lock{ mutate_clients_mutex };
-				clients.insert({ client->id, std::move(client) });
-			}
+			std::unique_lock lock{ mutate_clients_mutex };
+			clients.insert({ client->id, std::move(client) });
 		}
-
-		co_return;
 	}
 
-	async_task server::disconnect_client(uint64_t const& client_id)
+	void server::disconnect_client(uint64_t const& client_id)
 	{
 		std::unique_lock lock{ mutate_clients_mutex };
 
 		auto client = clients.find(client_id);
 
 		if (client == clients.end())
-		{
-			co_return;
-		}
+			return;
 
 		client->second->close();
 
 		clients.erase(client_id);
-
-		co_return;
 	}
 
-	async_task server::message_client(
+	void server::message_client(
 		std::shared_ptr<server_connection> const& client,
 		std::shared_ptr<socket_messages::message> const& message
 	) const
 	{
-		co_await client->send_message(message);
+		client->send_message(message);
 	}
 
-	server& server::on_message(std::function<async_task(server&, std::shared_ptr<server_connection>const&, std::shared_ptr<socket_messages::message>const&)> const& callback)
+	server& server::on_message(std::function<void(server&, std::shared_ptr<server_connection>const&, std::shared_ptr<socket_messages::message>const&)> const& callback)
 	{
 		on_message_callbacks.push_back(callback);
 		return *this;
 	}
 
-	server& server::on_connection_attempt(std::function<async_task(server&, std::shared_ptr<server_connection>const&)> const& callback)
+	server& server::on_connection_attempt(std::function<void(server&, std::shared_ptr<server_connection>const&)> const& callback)
 	{
 		on_connection_attemps_callbacks.push_back(callback);
 		return *this;
 	}
 
-	server& server::on_connection_failed(std::function<async_task(server&, std::shared_ptr<server_connection>const&)> const& callback)
+	server& server::on_connection_failed(std::function<void(server&, std::shared_ptr<server_connection>const&)> const& callback)
 	{
 		on_connection_failed_callbacks.push_back(callback);
 		return *this;
 	}
 
-	server& server::on_connection(std::function<async_task(server&, std::shared_ptr<server_connection>const&)> const& callback)
+	server& server::on_connection(std::function<void(server&, std::shared_ptr<server_connection>const&)> const& callback)
 	{
 		on_connection_callbacks.push_back(callback);
 		return *this;
 	}
 
-	server& server::on_ready(std::function<async_task(server&)> const& callback)
+	server& server::on_ready(std::function<void(server&)> const& callback)
 	{
 		on_ready_callbacks.push_back(callback);
 		return *this;

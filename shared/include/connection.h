@@ -24,22 +24,38 @@ namespace pine
 		virtual ~connection();
 
 		/// @brief Receive a managed message from the connection.
-		async_operation<std::shared_ptr<socket_messages::message>> receive_message();
+		async_operation<std::shared_ptr<socket_messages::message>> receive_message_async();
+
+		/// @brief Send a managed message to the connection.
+		std::shared_ptr<socket_messages::message> receive_message();
 
 		/// @brief Send a managed message to the connection.
 		/// @param message Message to send. The message must inherit from the message class.
 		/// @return An asynchronous task completed when the message has been sent.
-		async_task send_message(std::shared_ptr<socket_messages::message> const& message);
+		async_task send_message_async(std::shared_ptr<socket_messages::message> const& message);
+
+		/// @brief Send a managed message to the connection.
+		/// @param message Message to send.
+		void send_message(std::shared_ptr<socket_messages::message> const& message);
 
 		/// @brief Receive a raw message to the connection.
 		/// @param buffer_size Number of bytes to receive.
 		/// @return An asynchronous operation that returns the received bytes.
-		async_operation<std::vector<uint8_t>> receive_raw_message(uint64_t const& buffer_size);
+		async_operation<std::vector<uint8_t>> receive_raw_message_async(uint64_t const& buffer_size);
+
+		/// @brief Receive a raw message to the connection.
+		/// @param buffer_size Number of bytes to receive.
+		/// @return The received bytes.
+		std::vector<uint8_t> receive_raw_message(uint64_t const& buffer_size);
 
 		/// @brief Send a raw message to the connection.
 		/// @param buffer Buffer to send.
 		/// @return An asynchronous task completed when the message has been sent.
-		async_task send_raw_message(std::vector<uint8_t> const& buffer);
+		async_task send_raw_message_async(std::vector<uint8_t> const& buffer);
+
+		/// @brief Send a raw message to the connection.
+		/// @param buffer Buffer to send.
+		void send_raw_message(std::vector<uint8_t> const& buffer);
 
 		/// @brief Close the connection.
 		void close();

@@ -1,15 +1,26 @@
 #include <cstdint>
-#include <exception>
+#include <ios>
 #include <iostream>
 #include <memory>
+#include <string>
+#include <system_error>
+#include <type_traits>
 #include <vector>
 
-#include <asio.hpp>
+#include <asio/buffer.hpp>
+#include <asio/error.hpp>
+#include <asio/error_code.hpp>
+#include <asio/ip/tcp.hpp>
 
 #include "connection.h"
-#include "coroutine.h"
+#include "message.h"
 #include "snowflake.h"
-#include "socket_messages.h"
+#include "socket_messages/ack_message.h"
+#include "socket_messages/hello_message.h"
+#include "socket_messages/identify_message.h"
+#include "socket_messages/keep_alive_message.h"
+#include "socket_messages/receive_chat_message.h"
+#include "socket_messages/send_chat_message.h"
 
 namespace pine
 {
@@ -30,8 +41,7 @@ namespace pine
 			return buffer;
 
 		asio::error_code ec;
-		auto flags = asio::socket_base::message_peek;
-		size_t n = socket.receive(asio::buffer(buffer), flags, ec);
+		size_t n = socket.receive(asio::buffer(buffer), {}, ec);
 
 		if (ec && ec != asio::error::connection_reset && ec != asio::error::connection_aborted)
 		{

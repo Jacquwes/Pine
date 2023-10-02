@@ -4,13 +4,17 @@
 #include <ios>
 #include <iostream>
 #include <random>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 #include <asio/ip/tcp.hpp>
 #include <connection.h>
-#include <coroutine.h>
 #include <message.h>
 #include <snowflake.h>
-#include <socket_messages.h>
+#include <socket_messages/ack_message.h>
+#include <socket_messages/hello_message.h>
+#include <socket_messages/identify_message.h>
 
 #include "server.h"
 #include "server_connection.h"
@@ -29,20 +33,15 @@ namespace pine
 		std::cout << "[Server] New client connection opened: " << std::dec << id << std::endl;
 	}
 
-	async_task server_connection::listen()
+	void server_connection::listen()
 	{
-		co_await switch_thread(listen_thread);
-
 		std::scoped_lock lock(connection_mutex);
 
 		for (auto& callback : server_ref.on_connection_attemps_callbacks)
 			callback(server_ref, server_connection::shared_from_this());
 
-		if (!(co_await establish_connection()))
-		{
+		if (!(establish_connection()))
 			close();
-			co_return;
-		}
 
 		std::cout << "[Server]   Client successfully connected: " << std::dec << id << std::endl;
 		is_connected = true;
@@ -52,49 +51,46 @@ namespace pine
 
 		while (is_connected)
 		{
-			auto&& message = co_await receive_message();
+			auto&& message = receive_message();
 
 			if (message->header.type == socket_messages::message_type::INVALID_MESSAGE)
-			{
 				close();
-				co_return;
-			}
 
 			server_ref.handle_message(shared_from_this(), message);
 		}
 	}
 
-	async_operation<bool> server_connection::establish_connection()
+	bool server_connection::establish_connection()
 	{
-		if (!(co_await validate_connection()))
+		if (!(validate_connection()))
 		{
 			std::cout << "[Server]   Client failed validation: " << std::dec << id << std::endl;
-			co_return false;
+			return false;
 		}
 
 		std::cout << "[Server]   Client passed validation: " << std::dec << id << std::endl;
 
-		if (!(co_await check_version()))
+		if (!(check_version()))
 		{
 			std::cout << "[Server]   Client failed version check: " << std::dec << id << std::endl;
-			co_return false;
+			return false;
 		}
 
 		std::cout << "[Server]   Client passed version check: " << std::dec << id << std::endl;
 
-		if (!(co_await identify()))
+		if (!(identify()))
 		{
 			std::cout << "[Server]   Client failed identify: " << std::dec << id << std::endl;
-			co_return false;
+			return false;
 		}
 
 		std::cout << "[Server]   Client successfully identified in as \"" << user_data.username
 			<< "\": " << std::dec << id << std::endl;
 
-		co_return true;
+		return true;
 	}
 
-	async_operation<bool> server_connection::validate_connection()
+	bool server_connection::validate_connection()
 	{
 		std::random_device device;
 		std::default_random_engine engine(device());
@@ -110,11 +106,11 @@ namespace pine
 			<< id << "\n";
 		std::cout << "[Server]   Client should answer " << std::hex << (key ^ 0xF007CAFEC0C0CACA)
 			<< std::endl;
-		co_await send_raw_message(keyBuffer);
+		send_raw_message(keyBuffer);
 
-		auto&& response = co_await receive_raw_message(sizeof(uint64_t));
+		auto&& response = receive_raw_message(sizeof(uint64_t));
 		if (response.size() != sizeof(uint64_t))
-			co_return false;
+			return false;
 
 		key ^= 0xF007CAFEC0C0CACA;
 		keyBuffer.assign(
@@ -123,53 +119,49 @@ namespace pine
 		);
 
 		if (std::ranges::equal(keyBuffer, response))
-			co_return true;
-		co_return false;
+			return true;
+		return false;
 	}
 
-	async_operation<bool> server_connection::check_version()
+	bool server_connection::check_version()
 	{
-		co_await send_message(std::make_shared<socket_messages::hello_message>());
+		send_message(std::make_shared<socket_messages::hello_message>());
 
-		auto&& hello = co_await receive_message();
+		auto&& hello = receive_message();
 		if (hello->header.type != socket_messages::message_type::HELLO_MESSAGE)
-			co_return false;
+			return false;
 
 		auto version =
 			std::dynamic_pointer_cast<socket_messages::hello_message>(hello)->version;
 		if (version != current_version)
-			co_return false;
+			return false;
 
-		co_return true;
+		return true;
 	}
 
-	async_operation<bool> server_connection::identify()
+	bool server_connection::identify()
 	{
-		auto&& message = co_await receive_message();
+		auto&& message = receive_message();
 
 		if (message->header.type != socket_messages::message_type::IDENTIFY_MESSAGE)
-			co_return false;
+			return false;
 
 		auto&& identifyMessage =
 			std::dynamic_pointer_cast<socket_messages::identify_message>(message);
 
 		user_data.username = identifyMessage->username;
 
-		co_return true;
+		return true;
 	}
 
-	async_task server_connection::send_ack(snowflake id)
+	void server_connection::send_ack(snowflake id)
 	{
 		auto message = std::make_shared<socket_messages::acknowledge_message>(id);
-		co_await send_message(message);
+		send_message(message);
 	}
 
-	async_task server_connection::close()
+	void server_connection::close()
 	{
-		// Return to the server thread if we're not already on it.
-		if (std::this_thread::get_id() == listen_thread.get_id())
-			co_await switch_thread(listen_thread);
-
 		this->socket.close();
 
 		std::scoped_lock lock(connection_mutex);
@@ -179,7 +171,5 @@ namespace pine
 		server_ref.disconnect_client(id);
 
 		std::cout << "[Server]   Connection closed: " << std::dec << id << std::endl;
-
-		co_return;
 	}
 }

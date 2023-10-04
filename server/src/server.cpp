@@ -19,8 +19,10 @@ namespace pine
 		acceptor(context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
 	{}
 
-	void server::listen()
+	async_task server::listen()
 	{
+		co_await switch_thread();
+
 		is_listening = true;
 
 		if (!acceptor.is_open())
@@ -29,10 +31,10 @@ namespace pine
 		if (error_code)
 		{
 			std::cout << "[Server] Failed to open acceptor: " << error_code.message() << std::endl;
-			return;
+			co_return;
 		}
 
-		accept_clients();
+		co_await accept_clients();
 
 		std::cout << "[Server] Stopped listening" << std::endl;
 	}

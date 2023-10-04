@@ -26,6 +26,23 @@ inline auto switch_thread(std::jthread& out)
 	return awaitable{ &out };
 }
 
+/// @brief Continue execution on a new thread.
+/// @return A coroutine awaitable.
+inline auto switch_thread()
+{
+	struct awaitable
+	{
+		std::jthread thread;
+		bool await_ready() { return false; }
+		void await_suspend(std::coroutine_handle<> h)
+		{
+			thread = std::jthread([h] { h.resume(); });
+		}
+		void await_resume() {}
+	};
+	return awaitable{};
+}
+
 /// @brief An awaitable coroutine that returns a value.
 /// @tparam T The type of the value to return.
 /// @details For more information see: https://en.cppreference.com/w/cpp/language/coroutines

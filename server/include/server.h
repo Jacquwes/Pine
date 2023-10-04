@@ -30,7 +30,7 @@ namespace pine
 		server(asio::io_context& io_context, uint16_t const& port = 80);
 
 		/// @brief Start listening for connections.
-		void listen();
+		async_task listen();
 
 		/// @brief Stop listening for connections.
 		void stop();

@@ -5,25 +5,25 @@
 #include <stdexcept>
 #include <type_traits>
 
-struct awaitable
-{
-	std::shared_ptr<std::jthread>  p_out;
-	bool await_ready() { return false; }
-	void await_suspend(std::coroutine_handle<> h)
-	{
-		std::jthread& out = *p_out;
-		if (out.joinable())
-			throw std::runtime_error("Output jthread parameter not empty");
-		out = std::jthread([h] { h.resume(); });
-	}
-	void await_resume() {}
-};
-
 /// @brief Continue execution on a different thread.
 /// @param out The thread to continue execution on.
 /// @return A coroutine awaitable.
-inline awaitable switch_thread(std::shared_ptr<std::jthread> out)
+inline auto switch_thread(std::jthread* out)
 {
+	struct awaitable
+	{
+		std::jthread* p_out;
+		bool await_ready() { return false; }
+		void await_suspend(std::coroutine_handle<> h)
+		{
+			std::jthread& out = *p_out;
+			if (out.joinable())
+				throw std::runtime_error("Output jthread parameter not empty");
+			out = std::jthread([h] { h.resume(); });
+		}
+		void await_resume() {}
+	};
+
 	return awaitable{ out };
 }
 

@@ -63,19 +63,22 @@ struct async_operation
 	void await_suspend(std::coroutine_handle<> h) const { h.resume(); }
 	auto await_resume() { return _coroutine.promise()._value; }
 
-	std::coroutine_handle<promise_type> _coroutine = nullptr;
+	std::coroutine_handle<promise_type> _coroutine;
 
-	async_operation() = default;
-	explicit async_operation(std::coroutine_handle<promise_type> coroutine) : _coroutine(coroutine) {}
+	/// @brief Wait for the coroutine to complete.
+	T&& get_result() const
+	{
+		if (!_coroutine.done())
+			_coroutine.resume();
+		return std::move(_coroutine.promise()._value);
+	}
+
+	async_operation(std::coroutine_handle<promise_type> coroutine) : _coroutine(coroutine) {}
 	async_operation(async_operation const&) = delete;
 	async_operation(async_operation&& other) noexcept
 		: _coroutine(other._coroutine)
 	{
 		other._coroutine = nullptr;
-	}
-	~async_operation()
-	{
-		if (_coroutine.address()) _coroutine.destroy();
 	}
 
 	async_operation& operator=(async_operation&& other) noexcept
@@ -94,7 +97,10 @@ struct async_operation<void>
 {
 	struct promise_type
 	{
-		async_operation<void> get_return_object() const noexcept { return {}; }
+		async_operation<void> get_return_object() noexcept
+		{
+			return async_operation<void>(std::coroutine_handle<promise_type>::from_promise(*this));
+		}
 		std::suspend_never initial_suspend() const noexcept { return {}; }
 		std::suspend_always final_suspend() const noexcept { return {}; }
 		void unhandled_exception() const {}
@@ -105,19 +111,25 @@ struct async_operation<void>
 	void await_suspend(std::coroutine_handle<> h) const { h.resume(); }
 	void await_resume() { return; }
 
-	std::coroutine_handle<promise_type> _coroutine = nullptr;
+	std::coroutine_handle<promise_type> _coroutine;
 
-	async_operation() = default;
-	explicit async_operation(std::coroutine_handle<promise_type> coroutine) : _coroutine(coroutine) {}
+	/// @brief Wait for the coroutine to complete.
+	void get_result() const
+	{
+		if (!_coroutine.done())
+			_coroutine.resume();
+
+		_coroutine.promise().return_void();
+	}
+
+	async_operation(std::coroutine_handle<promise_type> coroutine) : _coroutine(coroutine) {}
+
 	async_operation(async_operation const&) = delete;
+
 	async_operation(async_operation&& other) noexcept
 		: _coroutine(other._coroutine)
 	{
 		other._coroutine = nullptr;
-	}
-	~async_operation()
-	{
-		if (_coroutine.address()) _coroutine.destroy();
 	}
 
 	async_operation& operator=(async_operation&& other) noexcept
@@ -128,7 +140,6 @@ struct async_operation<void>
 			other._coroutine = nullptr;
 		}
 	}
-
 };
 
 /// @brief An awaitable coroutine that returns nothing.

@@ -43,7 +43,6 @@ namespace pine
 		co_return buffer;
 	}
 
-
 	async_task connection::send_raw_message(std::vector<uint8_t> const& buffer)
 	{
 		if (buffer.empty())
@@ -60,8 +59,6 @@ namespace pine
 
 		co_return;
 	}
-
-
 
 	async_operation<std::shared_ptr<socket_messages::message>> connection::receive_message()
 	{
@@ -137,8 +134,6 @@ namespace pine
 
 		co_return message;
 	}
-
-
 
 	async_task connection::send_message(std::shared_ptr<socket_messages::message> const& message)
 	{

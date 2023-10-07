@@ -22,7 +22,18 @@ TEST(integration_tests, connect_client_to_server)
 
 	std::jthread server_thread([&]()
 		{
-			server.on_connection_attempt(
+			server.on_connection_failed(
+				[&](
+					pine::server& server,
+					std::shared_ptr<pine::server_connection> const& client
+					) -> async_task
+				{
+					ADD_FAILURE();
+					server_ready.release();
+					co_return;
+				});
+
+			server.on_connection(
 				[&](
 					pine::server& server,
 					std::shared_ptr<pine::server_connection> const& client
